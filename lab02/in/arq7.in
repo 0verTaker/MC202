@@ -1,0 +1,85 @@
+6 6 12 20
+
+X	X	X	X	X	X
+X	X	X	X	X	X
+X	X	X	E	X	X
+X	X	X	X	X	X
+X	X	X	X	S	E
+X	S	X	X	X	X
+
+X	X	X	X	X	X
+X	X	X	X	X	X
+X	X	X	X	X	X
+X	X	X	E	X	X
+X	X	X	X	P	P
+X	P	X	X	P	P
+
+S	P	P	X	X	X
+X	E	X	X	X	X
+X	X	X	X	X	X
+X	S	X	X	X	P
+E	X	X	S	P	P
+X	P	X	P	X	P
+
+P	X	P	X	X	X
+X	X	X	X	X	E
+X	X	S	X	X	X
+X	P	X	X	X	X
+X	X	E	X	P	X
+S	P	X	P	P	P
+
+P	X	P	P	P	X
+X	X	P	P	P	P
+X	X	P	X	E	P
+X	P	X	X	P	S
+X	P	X	X	P	P
+X	P	P	P	P	X
+
+P	X	X	P	P	X
+X	X	P	P	E	X
+X	S	P	P	P	X
+X	P	X	P	P	P
+X	X	X	X	P	P
+X	P	E	X	P	P
+
+P	X	X	P	P	P
+X	X	P	X	X	P
+P	S	X	P	P	X
+X	P	P	P	P	P
+X	X	X	X	X	X
+X	P	X	X	P	X
+
+P	P	X	P	P	E
+X	P	P	X	X	P
+P	P	S	X	X	X
+X	E	X	P	P	P
+X	X	X	S	X	X
+X	P	E	X	P	X
+
+P	P	P	S	P	X
+X	X	P	X	X	P
+E	X	X	S	P	P
+X	E	X	X	P	X
+X	X	X	X	X	X
+X	P	P	X	P	X
+
+S	P	E	P	P	P
+X	X	X	X	P	X
+P	X	X	X	P	S
+X	X	X	P	P	X
+X	X	X	X	X	E
+X	P	X	X	P	X
+
+P	P	X	S	X	P
+X	X	X	P	E	X
+P	X	X	P	P	P
+X	X	X	P	X	X
+X	X	X	X	X	X
+X	X	X	X	S	X
+
+E	X	X	X	X	S
+P	X	X	X	X	X
+P	X	X	X	X	X
+X	X	E	P	X	X
+X	X	X	X	X	X
+X	X	X	X	X	S
