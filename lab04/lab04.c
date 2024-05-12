@@ -127,6 +127,7 @@ int main(int argc, char **argv)
     printf("Altura da arvore: %d\n", AlturaArv(Arv));
     printf("Grau de cada nó em percurso simétrico:\n");
     GrauSim(Arv);
+    printf("teste");
     DestroiArvore(&Arv);
 
     return 0;
