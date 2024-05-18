@@ -14,11 +14,21 @@ typedef struct _AVLTree{
 
 void LeArquivo(char *nomearq, AVLTree **AVL)
 {
-    int SizeAux;
+    int SizeAux, prioridade;
+    char *ip[100];
+    
     FILE *fp = fopen(nomearq, "r");
     fscanf(fp, "%d\n", &SizeAux);
     (*AVL) = CriaAVL(SizeAux);
-    
+
+    for (int i = 0; i < SizeAux; i++)
+    {
+        fscanf(fp, "%s %d\n", ip, &prioridade);
+        NodeAVL *NewNode = CriaNode(ip, prioridade);
+        InsereNode(*AVL, NewNode);
+    }
+
+    fclose(fp);
 }
 
 
@@ -31,14 +41,14 @@ AVLTree *CriaAVL(int size)
     return p;
 }
 
-void CriaNode(AVLTree *AVL, char *ip, int prioridade)
+NodeAVL *CriaNode(char *ip, int prioridade)
 {
     NodeAVL *Node = (NodeAVL*)calloc(1, sizeof(NodeAVL));
     Node->ip = ip;
     Node->prioridade = prioridade;
     Node->dir = Node->esq = NULL;
 
-    AVL->raiz = Node;
+    return Node;
 }
 
 int main(int argc, char **argv)
