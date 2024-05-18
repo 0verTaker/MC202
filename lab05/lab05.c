@@ -170,6 +170,30 @@ void InsereNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisAlta)
     }
 }
 
+void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
+{
+    if ((*AVL) != NULL)
+    {
+        if ((*AVL)->prioridade != prioridade && strcmp((*AVL)->ip, ip) != 0)
+            {
+            if ((*AVL)->prioridade < prioridade)
+            {
+                RemoveNode(&((*AVL)->dir), ip, prioridade, MaisBaixa);
+                if ((*MaisBaixa == 1))
+                    TrataReducaoArvoreDireita(AVL, MaisBaixa);
+            }
+            else
+            {
+                RemoveNode(&((*AVL)->esq), ip, prioridade, MaisBaixa);
+                if ((*MaisBaixa == 1))
+                    TrataReducaoArvoreEsquerda(AVL, MaisBaixa);
+            }
+        }
+        else
+            RemoveDeFato(AVL, MaisBaixa);
+    }
+}
+
 void PrintConstruida(NodeAVL *AVL)
 {
     if (AVL != NULL)
@@ -221,6 +245,27 @@ void LeAVL(char *nomearq, AVLTree **AVL, char *MaisAlta)
     fclose(fp);
 }
 
+void LeComandos(char *nomearq, AVLTree **AVL, char *MaisAlta, char *MaisBaixa)
+{
+    int QntCmd, prioridade, cmd;
+    char ip[16];
+
+    FILE *fp = fopen(nomearq, "r");
+    fscanf(fp, "%d\n", &QntCmd);
+
+    for (int i = 0; i < QntCmd; i++)
+    {
+        fscanf(fp, "%d %s %d\n", &cmd, ip, prioridade);
+
+        if (cmd == 1)
+            InsereNode(&(*AVL)->raiz, ip, prioridade, MaisAlta);
+        else
+            RemoveNode(&(*AVL)->raiz, ip, prioridade, MaisBaixa);
+    }
+
+    fclose(fp);
+}
+
 int AlturaAVL(NodeAVL *AVL)
 {
     if (AVL != NULL)
@@ -246,7 +291,7 @@ int MaiorRota(NodeAVL *AVL)
 
 int main(int argc, char **argv)
 {
-    char MaisAlta;
+    char MaisAlta, MaisBaixa;
     AVLTree *AVL = NULL;
     
     LeAVL(argv[1], &AVL, &MaisAlta);
@@ -261,5 +306,5 @@ int main(int argc, char **argv)
 
     printf("A rota mais longa possível passa por %d nos", MaiorRota(AVL->raiz));
 
-    //LeComandos(argv[2]);
+    LeComandos(argv[2], &AVL, &MaisAlta, &MaisBaixa);
 }
