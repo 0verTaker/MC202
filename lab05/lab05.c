@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <math.h>
+
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 typedef struct _NodeAVL{
     int prioridade, bal;
@@ -217,6 +221,29 @@ void LeAVL(char *nomearq, AVLTree **AVL, char *MaisAlta)
     fclose(fp);
 }
 
+int AlturaAVL(NodeAVL *AVL)
+{
+    if (AVL != NULL)
+    {
+        return 1 + MAX(AlturaAVL((AVL->esq)), AlturaAVL(AVL->dir));
+    }
+    else
+        return 0;
+}
+
+bool AVLCheia(AVLTree *AVL)
+{
+    int Altura = AlturaAVL(AVL->raiz);
+    int MaxNodeCount = pow(2, Altura+1) - 1;
+    
+    return (AVL->size == MaxNodeCount);
+}
+
+int MaiorRota(NodeAVL *AVL)
+{
+    return (AlturaAVL(AVL->esq) + AlturaAVL(AVL->dir)) + 1;
+}
+
 int main(int argc, char **argv)
 {
     char MaisAlta;
@@ -226,4 +253,13 @@ int main(int argc, char **argv)
     
     printf("[INFO] Apos construcao:\n");
     PrintConstruida(AVL->raiz);
+    
+    if (AVLCheia(AVL))
+        printf("Arvore esta cheia\n");
+    else
+        printf("Arvore nao esta cheia\n");
+
+    printf("A rota mais longa possível passa por %d nos", MaiorRota(AVL->raiz));
+
+    //LeComandos(argv[2]);
 }
