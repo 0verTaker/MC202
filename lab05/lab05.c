@@ -20,6 +20,11 @@ typedef struct _AVLTree{
 NodeAVL *CriaNode(char *ip, int prioridade);
 void AjusteBalancoDuplaInsercao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
 void AjusteBalancoSimplesInsercao(NodeAVL *A, NodeAVL *B);
+void AjusteBalancoRotacaoEsquerdaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa);
+void AjusteBalancoRotacaoDireitaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa);
+void AjusteBalancoRotacaoEsquerdaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
+void AjusteBalancoRotacaoDireitaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
+
 
 void RotacaoSimplesEsquerda(NodeAVL **AVL)
 {
@@ -118,6 +123,77 @@ void TrataAumentoArvoreEsquerda(NodeAVL **AVL, char *MaisAlta)
     }
 }
 
+void TrataReducaoArvoreDireita(NodeAVL **AVL, char *MaisBaixa)
+{
+    NodeAVL *A,*B,*C;
+    A = (*AVL); 
+    B = (*AVL)->esq;
+
+    switch(A->bal)
+    {
+        case -1:
+            if (B->bal <= 0)
+            {
+                RotacaoSimplesDireita(AVL);
+                AjusteBalancoRotacaoDireitaSimplesRemocao(A, B, MaisBaixa); 
+            }
+            else
+            {
+                C = B->dir;
+                RotacaoDuplaDireita(AVL);
+                AjusteBalancoRotacaoDireitaDuplaRemocao(A, B, C);
+                (*MaisBaixa) =  1;
+            }
+            break;
+        
+        case 0:
+            (*AVL)->bal = -1;
+            (*AVL) = 0;
+            break; 
+
+        case 1:
+            (*AVL)->bal = 0;
+            (*MaisBaixa) = 1;
+            break;   
+    }
+}
+
+void TrataReducaoArvoreEsquerda(NodeAVL **AVL, char *MaisBaixa)
+{
+    NodeAVL *A,*B,*C;
+    
+  A = (*AVL); 
+  B = (*AVL)->dir;
+
+    switch(A->bal)
+    {
+        case 1:
+            if(B->bal >= 0)
+            {
+                RotacaoSimplesEsquerda(AVL);
+                AjusteBalancoRotacaoEsquerdaSimplesRemocao(A, B, MaisBaixa);
+            }
+            else
+            {
+                C = B->esq;
+                RotacaoDuplaEsquerda(AVL);
+                AjusteBalancoRotacaoEsquerdaDuplaRemocao(A, B, C);
+                (*MaisBaixa) =  1;
+            }
+            break;
+        
+        case 0:
+            A->bal = 1;    
+            (*MaisBaixa) = 0;
+            break;
+
+        case -1:
+            A->bal = 0;  
+            (*MaisBaixa) =  1;
+            break;
+    }
+}
+
 void AjusteBalancoDuplaInsercao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
 {
     switch (C->bal)
@@ -146,6 +222,81 @@ void AjusteBalancoSimplesInsercao(NodeAVL *A, NodeAVL *B)
     B->bal = 0;
 }
 
+void AjusteBalancoRotacaoDireitaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
+{
+    switch(C->bal) {
+        case -1:
+            A->bal = 1;
+            B->bal = 0;
+            break;
+        
+        case 0:
+            A->bal =  0;
+            B->bal =  0;
+            break;
+        
+        case +1:
+            A->bal =  0;
+            B->bal = -1;
+            break;
+        }
+        C->bal = 0;
+}
+
+void AjusteBalancoRotacaoEsquerdaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
+{
+    switch(C->bal) 
+    {
+        case -1:
+            A->bal = 0;
+            B->bal = 1;
+            break;
+        
+        case 0:
+            A->bal = 0;
+            B->bal = 0;
+            break;
+        
+        case +1:
+            A->bal = -1;
+            B->bal =  0;
+            break;
+    }
+        C->bal = 0;
+}
+
+void AjusteBalancoRotacaoDireitaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa)
+{
+    if (B->bal == -1)
+    { 
+        A->bal =  0;
+        B->bal =  0;
+        *MaisBaixa = 1;
+    } 
+    else 
+    {
+        A->bal = -1;
+        B->bal =  1;
+        *MaisBaixa = 0;
+    }
+}
+
+void AjusteBalancoRotacaoEsquerdaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa)
+{
+    if (B->bal == 1)
+    { 
+        A->bal =  0;
+        B->bal =  0;
+        *MaisBaixa = 1;
+    } 
+    else 
+    { 
+        A->bal =  1;
+        B->bal = -1;
+        *MaisBaixa = 0;
+    }
+}
+
 void InsereNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisAlta)
 {
     if ((*AVL) == NULL)
@@ -170,6 +321,65 @@ void InsereNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisAlta)
     }
 }
 
+char RemoveNoGrau0ou1(NodeAVL **AVL, char *MaisBaixa)
+{
+    NodeAVL *aux;
+
+    if ((*AVL)->esq == NULL)
+    {
+        aux   = (*AVL);
+        (*AVL) = (*AVL)->dir;
+        free(aux);
+    }
+    else
+    {
+        if ((*AVL)->dir == NULL)
+        {
+            aux = (*AVL);
+            (*AVL) = (*AVL)->esq;
+            free(aux);
+        }
+        else
+            return 0;
+    }
+    (*MaisBaixa) = 1;
+
+    return 1;
+}
+
+void SubstituiRemoveMenorSucessor(NodeAVL **AVL, NodeAVL **MaisEsq, char *MaisBaixa)
+{
+    if ((*MaisEsq)->esq == NULL)
+    {
+        (*AVL)->ip = (*MaisEsq)->ip;
+        (*AVL)->prioridade = (*MaisEsq)->prioridade;
+        
+        RemoveNoGrau0ou1(MaisEsq, MaisBaixa); 
+    }
+    else
+    {
+        SubstituiRemoveMenorSucessor(AVL, &((*MaisEsq)->esq), MaisBaixa);
+
+        if ((*MaisBaixa))
+            TrataReducaoArvoreEsquerda(MaisEsq, MaisBaixa);
+    }
+}
+
+void RemoveDeFato(NodeAVL **AVL, char *MaisBaixa)
+{
+    int bal;
+
+    if (RemoveNoGrau0ou1(AVL, MaisBaixa) == 0)
+    {
+        bal = (*AVL)->bal;
+        SubstituiRemoveMenorSucessor(AVL, &((*AVL)->dir), MaisBaixa);
+        (*AVL)->bal = bal;
+
+        if ((*MaisBaixa))
+            TrataReducaoArvoreDireita(AVL, MaisBaixa);
+    }
+}
+
 void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
 {
     if ((*AVL) != NULL)
@@ -191,16 +401,6 @@ void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
         }
         else
             RemoveDeFato(AVL, MaisBaixa);
-    }
-}
-
-void PrintConstruida(NodeAVL *AVL)
-{
-    if (AVL != NULL)
-    {
-        printf("- %s: %d\n", AVL->ip, AVL->prioridade);
-        PrintConstruida(AVL->esq);
-        PrintConstruida(AVL->dir);
     }
 }
 
@@ -255,12 +455,15 @@ void LeComandos(char *nomearq, AVLTree **AVL, char *MaisAlta, char *MaisBaixa)
 
     for (int i = 0; i < QntCmd; i++)
     {
-        fscanf(fp, "%d %s %d\n", &cmd, ip, prioridade);
+        fscanf(fp, "%d %s %d\n ", &cmd, ip, &prioridade);
 
+        //printf("cmd: %d, ip: %s, p: %d\n", cmd, ip, prioridade);
         if (cmd == 1)
             InsereNode(&(*AVL)->raiz, ip, prioridade, MaisAlta);
+            //printf("1\n");
         else
             RemoveNode(&(*AVL)->raiz, ip, prioridade, MaisBaixa);
+            //printf("-1\n");
     }
 
     fclose(fp);
@@ -289,9 +492,19 @@ int MaiorRota(NodeAVL *AVL)
     return (AlturaAVL(AVL->esq) + AlturaAVL(AVL->dir)) + 1;
 }
 
+void PrintConstruida(NodeAVL *AVL)
+{
+    if (AVL != NULL)
+    {
+        printf("- %s: %d\n", AVL->ip, AVL->prioridade);
+        PrintConstruida(AVL->esq);
+        PrintConstruida(AVL->dir);
+    }
+}
+
 int main(int argc, char **argv)
 {
-    char MaisAlta, MaisBaixa;
+    char MaisAlta = 0, MaisBaixa = 0;
     AVLTree *AVL = NULL;
     
     LeAVL(argv[1], &AVL, &MaisAlta);
@@ -304,7 +517,18 @@ int main(int argc, char **argv)
     else
         printf("Arvore nao esta cheia\n");
 
-    printf("A rota mais longa possível passa por %d nos", MaiorRota(AVL->raiz));
+    printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
 
     LeComandos(argv[2], &AVL, &MaisAlta, &MaisBaixa);
+
+    printf("\n[INFO] Apos atualizacao:\n");
+    PrintConstruida(AVL->raiz);
+
+    if (AVLCheia(AVL))
+        printf("Arvore esta cheia\n");
+    else
+        printf("Arvore nao esta cheia\n");
+
+    //printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
+
 }
