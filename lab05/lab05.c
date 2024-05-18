@@ -12,13 +12,14 @@ typedef struct _AVLTree{
     NodeAVL *raiz;
 }AVLTree;
 
-void LeArquivo(char *nomearq, AVLTree **AVL)
+void LeAVL(char *nomearq, AVLTree **AVL)
 {
     int SizeAux, prioridade;
     char *ip[100];
     
     FILE *fp = fopen(nomearq, "r");
     fscanf(fp, "%d\n", &SizeAux);
+    
     (*AVL) = CriaAVL(SizeAux);
 
     for (int i = 0; i < SizeAux; i++)
