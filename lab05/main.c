@@ -8,7 +8,7 @@
 
 
 typedef struct _NodeAVL{
-    int prioridade, bal;
+    int prioridade, altura;
     char *ip;
     struct _NodeAVL *esq, *dir; 
 }NodeAVL;
@@ -37,7 +37,7 @@ NodeAVL *CriaNode(char *ip, int prioridade)
     
     Node->ip = strdup(ip);
     Node->prioridade = prioridade;
-    Node->bal = 1;
+    Node->altura = 1;
     Node->dir = Node->esq = NULL;
 
     return Node;
@@ -86,16 +86,10 @@ AVLTree *LeComandos(char *nomearq, AVLTree *AVL)
     {
         fscanf(fp, "%d %s %d\n ", &cmd, ip, &prioridade);
 
-        //printf("cmd: %d, ip: %s, p: %d\n", cmd, ip, prioridade);
         if (cmd == 1)
             AVL->raiz = InsereNode(AVL->raiz, ip, prioridade);
-            //printf("1\n");
         else
-        {
             AVL->raiz = RemoveNode(AVL->raiz, ip, prioridade);
-            //printf("-1\n");
-        }
-
     }
 
     fclose(fp);
@@ -121,7 +115,7 @@ int Altura(NodeAVL *AVL)
 {
     if (AVL == NULL)
         return 0;
-    return AVL->bal;
+    return AVL->altura;
 }
 
 NodeAVL *RotacaoDireita(NodeAVL *Y)
@@ -132,8 +126,8 @@ NodeAVL *RotacaoDireita(NodeAVL *Y)
     X->dir = Y;
     Y->esq = T2;
 
-    Y->bal = MAX(Altura(Y->esq), Altura(Y->dir)) + 1;
-    X->bal = MAX(Altura(X->esq), Altura(X->dir)) + 1;
+    Y->altura = MAX(Altura(Y->esq), Altura(Y->dir)) + 1;
+    X->altura = MAX(Altura(X->esq), Altura(X->dir)) + 1;
 
     return X;
 }
@@ -146,8 +140,8 @@ NodeAVL *RotacaoEsquerda(NodeAVL *X)
     Y->esq = X;
     X->dir = T2;
 
-    X->bal = MAX(Altura(X->esq), Altura(X->dir)) + 1;
-    Y->bal = MAX(Altura(Y->esq), Altura(Y->dir)) + 1;
+    X->altura = MAX(Altura(X->esq), Altura(X->dir)) + 1;
+    Y->altura = MAX(Altura(Y->esq), Altura(Y->dir)) + 1;
 
     return Y;
 }
@@ -165,11 +159,11 @@ NodeAVL *InsereNode(NodeAVL *AVL, char *ip, int prioridade)
         return CriaNode(ip, prioridade);
     else
     {
-        if (prioridade <= AVL->prioridade && (strcmp(AVL->ip, ip) != 0))
+        if (prioridade < AVL->prioridade)
         {
           AVL->esq = InsereNode(AVL->esq, ip, prioridade);
         }
-        else if (prioridade >= AVL->prioridade && (strcmp(AVL->ip, ip) != 0))
+        else if (prioridade >= AVL->prioridade)
         {
             AVL->dir = InsereNode(AVL->dir, ip, prioridade);
         }
@@ -177,23 +171,23 @@ NodeAVL *InsereNode(NodeAVL *AVL, char *ip, int prioridade)
             return AVL;
     }
 
-    AVL->bal = 1 + MAX(Altura(AVL->esq), Altura(AVL->dir));
+    AVL->altura = 1 + MAX(Altura(AVL->esq), Altura(AVL->dir));
 
     int balanco = PegaBalanco(AVL); 
 
-    if (balanco > 1 && prioridade <= AVL->esq->prioridade)
+    if (balanco > 1 && prioridade < AVL->esq->prioridade)
         return RotacaoDireita(AVL);
 
-    if (balanco < -1 && prioridade >= AVL->dir->prioridade)
+    if (balanco < -1 && prioridade > AVL->dir->prioridade)
         return RotacaoEsquerda(AVL);
     
-    if (balanco > 1 && prioridade >= AVL->esq->prioridade)
+    if (balanco > 1 && prioridade > AVL->esq->prioridade)
     {
         AVL->esq = RotacaoEsquerda(AVL->esq);
         return RotacaoDireita(AVL);
     }
 
-    if (balanco < -1 && prioridade <= AVL->dir->prioridade)
+    if (balanco < -1 && prioridade < AVL->dir->prioridade)
     {
         AVL->dir = RotacaoDireita(AVL->dir);
         return RotacaoEsquerda(AVL);
@@ -202,57 +196,60 @@ NodeAVL *InsereNode(NodeAVL *AVL, char *ip, int prioridade)
     return AVL;
 }
 
-NodeAVL *RemoveNode(NodeAVL *AVL, char *ip, int prioridade)
-{
+NodeAVL *RemoveNode(NodeAVL *AVL, char *ip, int prioridade) {
     if (AVL == NULL)
         return AVL;
-    
-    if (prioridade <= AVL->prioridade && (strcmp(AVL->ip, ip) == 0))
+
+    if (prioridade < AVL->prioridade) 
     {
         AVL->esq = RemoveNode(AVL->esq, ip, prioridade);
-    }
-    else if (prioridade >= AVL->prioridade && (strcmp(AVL->ip, ip) == 0))
+    } 
+    else if (prioridade > AVL->prioridade) 
     {
         AVL->dir = RemoveNode(AVL->dir, ip, prioridade);
-    }
-    else
+    } 
+    else 
     {
-        if ((AVL->dir == NULL) || (AVL->esq == NULL))
-        {
-            NodeAVL *temp = AVL->esq ? AVL->dir : AVL->dir;
+        if (strcmp(AVL->ip, ip) == 0) {
+            if (AVL->esq == NULL || AVL->dir == NULL) {
+                NodeAVL *temp = AVL->esq ? AVL->esq : AVL->dir;
 
-            if (temp == NULL)
-            {
-                temp = AVL;
-                AVL = NULL;
-            }
-            else
-            {
-                *AVL = *temp;
+                if (temp == NULL) 
+                {
+                    temp = AVL;
+                    AVL = NULL;
+                } 
+                else 
+                {
+                    *AVL = *temp;  
+                }
                 free(temp);
+            } 
+            else 
+            {
+                NodeAVL *temp = MenorValor(AVL->dir);
+                free(AVL->ip);
+                AVL->ip = strdup(temp->ip);
+                AVL->prioridade = temp->prioridade;
+                AVL->dir = RemoveNode(AVL->dir, temp->ip, temp->prioridade);
             }
-        }
-        else
+        } 
+        else 
         {
-            NodeAVL *temp = MenorValor(AVL->dir);
-            AVL->ip = temp->ip;
-            AVL->prioridade = temp->prioridade;
-
-            AVL->dir = RemoveNode(AVL->dir, temp->ip, temp->prioridade);
+            return AVL;
         }
     }
 
     if (AVL == NULL)
         return AVL;
-    
-    AVL->bal = 1 + MAX(Altura(AVL->esq), Altura(AVL->dir));
+
+    AVL->altura = 1 + MAX(Altura(AVL->esq), Altura(AVL->dir));
     int balanco = PegaBalanco(AVL);
 
     if (balanco > 1 && PegaBalanco(AVL->esq) >= 0)
         return RotacaoDireita(AVL);
-    
-    if (balanco > 1 && PegaBalanco(AVL->esq) < 0)
-    {
+
+    if (balanco > 1 && PegaBalanco(AVL->esq) < 0) {
         AVL->esq = RotacaoEsquerda(AVL->esq);
         return RotacaoDireita(AVL);
     }
@@ -260,9 +257,7 @@ NodeAVL *RemoveNode(NodeAVL *AVL, char *ip, int prioridade)
     if (balanco < -1 && PegaBalanco(AVL->dir) <= 0)
         return RotacaoEsquerda(AVL);
 
-    
-    if (balanco < -1 && PegaBalanco(AVL->dir) > 0)
-    {
+    if (balanco < -1 && PegaBalanco(AVL->dir) > 0) {
         AVL->dir = RotacaoDireita(AVL->dir);
         return RotacaoEsquerda(AVL);
     }
@@ -300,7 +295,7 @@ int main(int argc, char **argv)
 
     printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
 
-    AVL = LeComandos("in/arq4.in2", AVL);
+    AVL = LeComandos("in/arq2.in4", AVL);
 
     printf("\n[INFO] Apos atualizacao:\n");
     PrintConstruida(AVL->raiz);

@@ -7,7 +7,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 typedef struct _NodeAVL{
-    int prioridade, bal;
+    int prioridade, altura;
     char *ip;
     struct _NodeAVL *esq, *dir; 
 }NodeAVL;
@@ -63,10 +63,10 @@ void TrataAumentoArvoreDireita(NodeAVL **AVL, char *MaisAlta)
     B = (*AVL)->dir;
     C = B->esq;
 
-    switch (A->bal)
+    switch (A->altura)
     {
         case 1:
-            if (B->bal == 1) //perdeu balanço
+            if (B->altura == 1) //perdeu balanço
             {
                 RotacaoSimplesEsquerda(AVL);
                 AjusteBalancoSimplesInsercao(A,B);
@@ -80,12 +80,12 @@ void TrataAumentoArvoreDireita(NodeAVL **AVL, char *MaisAlta)
             break;
         
         case 0:
-            A->bal = 1;
+            A->altura = 1;
             (*MaisAlta) = 1; 	
             break;
         
         case -1:
-            A->bal = 0;
+            A->altura = 0;
             (*MaisAlta) = 0; 	
             break;
     }
@@ -98,10 +98,10 @@ void TrataAumentoArvoreEsquerda(NodeAVL **AVL, char *MaisAlta)
     B = (*AVL)->esq;
     C = B->dir;
 
-    switch (A->bal)
+    switch (A->altura)
     {
         case -1:
-            if (B->bal == -1){
+            if (B->altura == -1){
                 RotacaoSimplesDireita(AVL);
                 AjusteBalancoSimplesInsercao(A,B);
             }
@@ -113,11 +113,11 @@ void TrataAumentoArvoreEsquerda(NodeAVL **AVL, char *MaisAlta)
             (*MaisAlta) = 0;
             break;
         case 0:
-            (*AVL)->bal = -1;
+            (*AVL)->altura = -1;
             (*MaisAlta) = 1; 
             break;
         case 1:
-            (*AVL)->bal = 0;
+            (*AVL)->altura = 0;
             (*MaisAlta) =  0;
             break;
     }
@@ -129,10 +129,10 @@ void TrataReducaoArvoreDireita(NodeAVL **AVL, char *MaisBaixa)
     A = (*AVL); 
     B = (*AVL)->esq;
 
-    switch(A->bal)
+    switch(A->altura)
     {
         case -1:
-            if (B->bal <= 0)
+            if (B->altura <= 0)
             {
                 RotacaoSimplesDireita(AVL);
                 AjusteBalancoRotacaoDireitaSimplesRemocao(A, B, MaisBaixa); 
@@ -147,12 +147,12 @@ void TrataReducaoArvoreDireita(NodeAVL **AVL, char *MaisBaixa)
             break;
         
         case 0:
-            (*AVL)->bal = -1;
+            (*AVL)->altura = -1;
             (*MaisBaixa) = 0;
             break; 
 
         case 1:
-            (*AVL)->bal = 0;
+            (*AVL)->altura = 0;
             (*MaisBaixa) = 1;
             break;   
     }
@@ -165,10 +165,10 @@ void TrataReducaoArvoreEsquerda(NodeAVL **AVL, char *MaisBaixa)
   A = (*AVL); 
   B = (*AVL)->dir;
 
-    switch(A->bal)
+    switch(A->altura)
     {
         case 1:
-            if(B->bal >= 0)
+            if(B->altura >= 0)
             {
                 RotacaoSimplesEsquerda(AVL);
                 AjusteBalancoRotacaoEsquerdaSimplesRemocao(A, B, MaisBaixa);
@@ -183,12 +183,12 @@ void TrataReducaoArvoreEsquerda(NodeAVL **AVL, char *MaisBaixa)
             break;
         
         case 0:
-            A->bal = 1;    
+            A->altura = 1;    
             (*MaisBaixa) = 0;
             break;
 
         case -1:
-            A->bal = 0;  
+            A->altura = 0;  
             (*MaisBaixa) =  1;
             break;
     }
@@ -196,103 +196,103 @@ void TrataReducaoArvoreEsquerda(NodeAVL **AVL, char *MaisBaixa)
 
 void AjusteBalancoDuplaInsercao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
 {
-    switch (C->bal)
+    switch (C->altura)
     {
         case -1:
-        A->bal = 1;
-        B->bal = 0;
+        A->altura = 1;
+        B->altura = 0;
         break;
 
         case 0:
-        A->bal = 0;
-        B->bal = 0;
+        A->altura = 0;
+        B->altura = 0;
         break;
 
         case +1:
-        A->bal =  0;
-        B->bal = -1;
+        A->altura =  0;
+        B->altura = -1;
         break;
     }
-    C->bal = 0;
+    C->altura = 0;
 }
 
 void AjusteBalancoSimplesInsercao(NodeAVL *A, NodeAVL *B)
 {
-    A->bal = 0;
-    B->bal = 0;
+    A->altura = 0;
+    B->altura = 0;
 }
 
 void AjusteBalancoRotacaoDireitaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
 {
-    switch(C->bal) {
+    switch(C->altura) {
         case -1:
-            A->bal = 1;
-            B->bal = 0;
+            A->altura = 1;
+            B->altura = 0;
             break;
         
         case 0:
-            A->bal =  0;
-            B->bal =  0;
+            A->altura =  0;
+            B->altura =  0;
             break;
         
         case +1:
-            A->bal =  0;
-            B->bal = -1;
+            A->altura =  0;
+            B->altura = -1;
             break;
         }
-        C->bal = 0;
+        C->altura = 0;
 }
 
 void AjusteBalancoRotacaoEsquerdaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
 {
-    switch(C->bal) 
+    switch(C->altura) 
     {
         case -1:
-            A->bal = 0;
-            B->bal = 1;
+            A->altura = 0;
+            B->altura = 1;
             break;
         
         case 0:
-            A->bal = 0;
-            B->bal = 0;
+            A->altura = 0;
+            B->altura = 0;
             break;
         
         case +1:
-            A->bal = -1;
-            B->bal =  0;
+            A->altura = -1;
+            B->altura =  0;
             break;
     }
-        C->bal = 0;
+        C->altura = 0;
 }
 
 void AjusteBalancoRotacaoDireitaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa)
 {
-    if (B->bal == -1)
+    if (B->altura == -1)
     { 
-        A->bal =  0;
-        B->bal =  0;
+        A->altura =  0;
+        B->altura =  0;
         *MaisBaixa = 1;
     } 
     else 
     {
-        A->bal = -1;
-        B->bal =  1;
+        A->altura = -1;
+        B->altura =  1;
         *MaisBaixa = 0;
     }
 }
 
 void AjusteBalancoRotacaoEsquerdaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa)
 {
-    if (B->bal == 1)
+    if (B->altura == 1)
     { 
-        A->bal =  0;
-        B->bal =  0;
+        A->altura =  0;
+        B->altura =  0;
         *MaisBaixa = 1;
     } 
     else 
     { 
-        A->bal =  1;
-        B->bal = -1;
+        A->altura =  1;
+        B->altura = -1;
         *MaisBaixa = 0;
     }
 }
@@ -371,9 +371,9 @@ void RemoveDeFato(NodeAVL **AVL, char *MaisBaixa)
 
     if (RemoveNoGrau0ou1(AVL, MaisBaixa) == 0)
     {
-        bal = (*AVL)->bal;
+        bal = (*AVL)->altura;
         SubstituiRemoveMenorSucessor(AVL, &((*AVL)->dir), MaisBaixa);
-        (*AVL)->bal = bal;
+        (*AVL)->altura = bal;
 
         if ((*MaisBaixa))
             TrataReducaoArvoreDireita(AVL, MaisBaixa);
@@ -419,7 +419,7 @@ NodeAVL *CriaNode(char *ip, int prioridade)
     
     Node->ip = strdup(ip);
     Node->prioridade = prioridade;
-    Node->bal = 0;
+    Node->altura = 0;
     Node->dir = Node->esq = NULL;
 
     return Node;
