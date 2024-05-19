@@ -148,7 +148,7 @@ void TrataReducaoArvoreDireita(NodeAVL **AVL, char *MaisBaixa)
         
         case 0:
             (*AVL)->bal = -1;
-            (*AVL) = 0;
+            (*MaisBaixa) = 0;
             break; 
 
         case 1:
@@ -386,20 +386,20 @@ void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
     {
         if ((*AVL)->prioridade != prioridade && strcmp((*AVL)->ip, ip) != 0)
             {
-            if ((*AVL)->prioridade < prioridade)
+            if ((*AVL)->prioridade <= prioridade)
             {
                 RemoveNode(&((*AVL)->dir), ip, prioridade, MaisBaixa);
-                if ((*MaisBaixa == 1))
+                if ((*MaisBaixa) == 1)
                     TrataReducaoArvoreDireita(AVL, MaisBaixa);
             }
             else
             {
                 RemoveNode(&((*AVL)->esq), ip, prioridade, MaisBaixa);
-                if ((*MaisBaixa == 1))
+                if ((*MaisBaixa) == 1)
                     TrataReducaoArvoreEsquerda(AVL, MaisBaixa);
             }
         }
-        else
+        else if ((*AVL)->prioridade == prioridade && strcmp((*AVL)->ip, ip) == 0)
             RemoveDeFato(AVL, MaisBaixa);
     }
 }
@@ -448,7 +448,7 @@ void LeAVL(char *nomearq, AVLTree **AVL, char *MaisAlta)
 void LeComandos(char *nomearq, AVLTree **AVL, char *MaisAlta, char *MaisBaixa)
 {
     int QntCmd, prioridade, cmd;
-    char ip[16];
+    char ip[20];
 
     FILE *fp = fopen(nomearq, "r");
     fscanf(fp, "%d\n", &QntCmd);
@@ -532,7 +532,7 @@ int main(int argc, char **argv)
     else
         printf("Arvore nao esta cheia\n");
 
-    //printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
+    printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
 
 }
 

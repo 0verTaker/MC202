@@ -24,7 +24,7 @@ void AjusteBalancoRotacaoEsquerdaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *Ma
 void AjusteBalancoRotacaoDireitaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa);
 void AjusteBalancoRotacaoEsquerdaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
 void AjusteBalancoRotacaoDireitaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
-
+void PrintConstruida(NodeAVL *AVL);
 
 void RotacaoSimplesEsquerda(NodeAVL **AVL)
 {
@@ -148,7 +148,7 @@ void TrataReducaoArvoreDireita(NodeAVL **AVL, char *MaisBaixa)
         
         case 0:
             (*AVL)->bal = -1;
-            (*AVL) = 0;
+            (*MaisBaixa) = 0;
             break; 
 
         case 1:
@@ -327,7 +327,7 @@ char RemoveNoGrau0ou1(NodeAVL **AVL, char *MaisBaixa)
 
     if ((*AVL)->esq == NULL)
     {
-        aux   = (*AVL);
+        aux = (*AVL);
         (*AVL) = (*AVL)->dir;
         free(aux);
     }
@@ -399,7 +399,7 @@ void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
                     TrataReducaoArvoreEsquerda(AVL, MaisBaixa);
             }
         }
-        else
+        else 
             RemoveDeFato(AVL, MaisBaixa);
     }
 }
@@ -448,7 +448,7 @@ void LeAVL(char *nomearq, AVLTree **AVL, char *MaisAlta)
 void LeComandos(char *nomearq, AVLTree **AVL, char *MaisAlta, char *MaisBaixa)
 {
     int QntCmd, prioridade, cmd;
-    char ip[16];
+    char ip[20];
 
     FILE *fp = fopen(nomearq, "r");
     fscanf(fp, "%d\n", &QntCmd);
@@ -462,8 +462,11 @@ void LeComandos(char *nomearq, AVLTree **AVL, char *MaisAlta, char *MaisBaixa)
             InsereNode(&(*AVL)->raiz, ip, prioridade, MaisAlta);
             //printf("1\n");
         else
+        {
             RemoveNode(&(*AVL)->raiz, ip, prioridade, MaisBaixa);
             //printf("-1\n");
+        }
+
     }
 
     fclose(fp);
@@ -532,3 +535,4 @@ int main(int argc, char **argv)
     printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
 
 }
+
