@@ -9,7 +9,7 @@
 
 typedef struct _NodeAVL{
     int prioridade, altura;
-    char *ip;
+    char ip[20];
     struct _NodeAVL *esq, *dir; 
 }NodeAVL;
 
@@ -35,7 +35,7 @@ NodeAVL *CriaNode(char *ip, int prioridade)
 {
     NodeAVL *Node = (NodeAVL*)calloc(1, sizeof(NodeAVL));
     
-    Node->ip = strdup(ip);
+    strcpy(Node->ip, ip);
     Node->prioridade = prioridade;
     Node->altura = 1;
     Node->dir = Node->esq = NULL;
@@ -228,8 +228,8 @@ NodeAVL *RemoveNode(NodeAVL *AVL, char *ip, int prioridade) {
             else 
             {
                 NodeAVL *temp = MenorValor(AVL->dir);
-                free(AVL->ip);
-                AVL->ip = strdup(temp->ip);
+                //AVL->ip = strdup(temp->ip);
+                strcpy(AVL->ip, temp->ip); 
                 AVL->prioridade = temp->prioridade;
                 AVL->dir = RemoveNode(AVL->dir, temp->ip, temp->prioridade);
             }
@@ -279,11 +279,30 @@ bool AVLCheia(NodeAVL *AVL)
     return false;
 }
 
+void DestroiNode(NodeAVL *Node)
+{
+    if (Node != NULL)
+    {
+        DestroiNode(Node->esq);
+        DestroiNode(Node->dir);
+        //free(Node->ip);
+        free(Node);
+    }
+}
+
+void DestroiAVL(AVLTree **AVL)
+{
+    if (AVL != NULL && *AVL != NULL) {
+        DestroiNode((*AVL)->raiz);
+        free(*AVL);
+        *AVL = NULL;
+    }
+}
+
 int main(int argc, char **argv)
 {
     AVLTree *AVL = NULL;
-    
-    AVL = LeAVL("in/arq4.in1", AVL);
+    AVL = LeAVL("in/arq3.in1", AVL);
     
     printf("[INFO] Apos construcao:\n");
     PrintConstruida(AVL->raiz);
@@ -293,9 +312,9 @@ int main(int argc, char **argv)
     else
         printf("Arvore nao esta cheia\n");
 
-    printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
+    printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 
-    AVL = LeComandos("in/arq2.in4", AVL);
+    AVL = LeComandos("in/arq3.in2", AVL);
 
     printf("\n[INFO] Apos atualizacao:\n");
     PrintConstruida(AVL->raiz);
@@ -305,6 +324,7 @@ int main(int argc, char **argv)
     else
         printf("Arvore nao esta cheia\n");
 
-    printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
+    printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 
+    DestroiAVL(&AVL);
 }
