@@ -120,31 +120,33 @@ int Altura(NodeAVL *AVL)
 
 NodeAVL *RotacaoDireita(NodeAVL *Y)
 {
-    NodeAVL *X = Y->esq;
-    NodeAVL *T2 = X->dir;
+    NodeAVL *FilhoEsq = Y->esq;
 
-    X->dir = Y;
-    Y->esq = T2;
+    Y->esq = FilhoEsq->dir;
+    FilhoEsq->dir = Y;
 
+    /* Atualiza a altura dos nós após a rotação */
     Y->altura = MAX(Altura(Y->esq), Altura(Y->dir)) + 1;
-    X->altura = MAX(Altura(X->esq), Altura(X->dir)) + 1;
+    FilhoEsq->altura = MAX(Altura(FilhoEsq->esq), Altura(FilhoEsq->dir)) + 1;
 
-    return X;
+    return FilhoEsq; 
 }
+
 
 NodeAVL *RotacaoEsquerda(NodeAVL *X)
 {
-    NodeAVL *Y = X->dir;
-    NodeAVL *T2 = Y->esq;
+    NodeAVL *FilhoDir = X->dir; /* salva filho a esquerda */
 
-    Y->esq = X;
-    X->dir = T2;
+    X->dir = FilhoDir->esq;
+    FilhoDir->esq = X;
 
+    /* Atualiza a altura dos nós após a rotação */
     X->altura = MAX(Altura(X->esq), Altura(X->dir)) + 1;
-    Y->altura = MAX(Altura(Y->esq), Altura(Y->dir)) + 1;
+    FilhoDir->altura = MAX(Altura(FilhoDir->esq), Altura(FilhoDir->dir)) + 1;
 
-    return Y;
+    return FilhoDir; // Retorna o novo nó raiz após a rotação
 }
+
 
 int PegaBalanco(NodeAVL *AVL)
 {
@@ -159,7 +161,7 @@ NodeAVL *InsereNode(NodeAVL *AVL, char *ip, int prioridade)
         return CriaNode(ip, prioridade);
     else
     {
-        if (prioridade < AVL->prioridade)
+        if (prioridade <= AVL->prioridade)
         {
           AVL->esq = InsereNode(AVL->esq, ip, prioridade);
         }
@@ -175,19 +177,19 @@ NodeAVL *InsereNode(NodeAVL *AVL, char *ip, int prioridade)
 
     int balanco = PegaBalanco(AVL); 
 
-    if (balanco > 1 && prioridade < AVL->esq->prioridade)
+    if (balanco > 1 && prioridade <= AVL->esq->prioridade)
         return RotacaoDireita(AVL);
 
-    if (balanco < -1 && prioridade > AVL->dir->prioridade)
+    if (balanco < -1 && prioridade >= AVL->dir->prioridade)
         return RotacaoEsquerda(AVL);
     
-    if (balanco > 1 && prioridade > AVL->esq->prioridade)
+    if (balanco > 1 && prioridade >= AVL->esq->prioridade)
     {
         AVL->esq = RotacaoEsquerda(AVL->esq);
         return RotacaoDireita(AVL);
     }
 
-    if (balanco < -1 && prioridade < AVL->dir->prioridade)
+    if (balanco < -1 && prioridade <= AVL->dir->prioridade)
     {
         AVL->dir = RotacaoDireita(AVL->dir);
         return RotacaoEsquerda(AVL);
