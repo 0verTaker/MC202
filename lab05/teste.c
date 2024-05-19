@@ -24,7 +24,7 @@ void AjusteBalancoRotacaoEsquerdaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *Ma
 void AjusteBalancoRotacaoDireitaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa);
 void AjusteBalancoRotacaoEsquerdaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
 void AjusteBalancoRotacaoDireitaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
-
+void PrintConstruida(NodeAVL *AVL);
 
 void RotacaoSimplesEsquerda(NodeAVL **AVL)
 {
@@ -327,7 +327,7 @@ char RemoveNoGrau0ou1(NodeAVL **AVL, char *MaisBaixa)
 
     if ((*AVL)->esq == NULL)
     {
-        aux   = (*AVL);
+        aux = (*AVL);
         (*AVL) = (*AVL)->dir;
         free(aux);
     }
@@ -462,8 +462,11 @@ void LeComandos(char *nomearq, AVLTree **AVL, char *MaisAlta, char *MaisBaixa)
             InsereNode(&(*AVL)->raiz, ip, prioridade, MaisAlta);
             //printf("1\n");
         else
+        {
             RemoveNode(&(*AVL)->raiz, ip, prioridade, MaisBaixa);
             //printf("-1\n");
+        }
+
     }
 
     fclose(fp);
@@ -505,19 +508,9 @@ void PrintConstruida(NodeAVL *AVL)
 int main(int argc, char **argv)
 {
     char MaisAlta = 0, MaisBaixa = 0;
-    int aux, prioridade;
-    char ip[16];
     AVLTree *AVL = NULL;
     
-    scanf("%d\n", &aux);
-    AVL = CriaAVL(aux);
-    
-    for (int i = 0; i < aux; i++)
-    {
-        scanf("%s %d\n ", ip, &prioridade);
-        //NodeAVL *NewNode = CriaNode(ip, prioridade);
-        InsereNode(&AVL->raiz, ip, prioridade, &MaisAlta);
-    }
+    LeAVL("in/arq1.in1", &AVL, &MaisAlta);
     
     printf("[INFO] Apos construcao:\n");
     PrintConstruida(AVL->raiz);
@@ -529,23 +522,17 @@ int main(int argc, char **argv)
 
     printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
 
+    LeComandos("in/arq1.in2", &AVL, &MaisAlta, &MaisBaixa);
 
+    printf("\n[INFO] Apos atualizacao:\n");
+    PrintConstruida(AVL->raiz);
 
-
-
-
-
-
-    // LeComandos(argv[2], &AVL, &MaisAlta, &MaisBaixa);
-
-    // printf("\n[INFO] Apos atualizacao:\n");
-    // PrintConstruida(AVL->raiz);
-
-    // if (AVLCheia(AVL))
-    //     printf("Arvore esta cheia\n");
-    // else
-    //     printf("Arvore nao esta cheia\n");
+    if (AVLCheia(AVL))
+        printf("Arvore esta cheia\n");
+    else
+        printf("Arvore nao esta cheia\n");
 
     //printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
 
 }
+

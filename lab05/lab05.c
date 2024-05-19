@@ -529,6 +529,6 @@ int main(int argc, char **argv)
     else
         printf("Arvore nao esta cheia\n");
 
-    //printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
+    printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
 
 }
