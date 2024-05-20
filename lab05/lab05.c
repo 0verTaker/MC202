@@ -8,7 +8,7 @@
 
 typedef struct _NodeAVL{
     int prioridade, altura;
-    char *ip;
+    char ip[20];
     struct _NodeAVL *esq, *dir; 
 }NodeAVL;
 
@@ -351,7 +351,8 @@ void SubstituiRemoveMenorSucessor(NodeAVL **AVL, NodeAVL **MaisEsq, char *MaisBa
 {
     if ((*MaisEsq)->esq == NULL)
     {
-        (*AVL)->ip = (*MaisEsq)->ip;
+        //(*AVL)->ip = (*MaisEsq)->ip;
+        strcpy((*AVL)->ip, (*MaisEsq)->ip);
         (*AVL)->prioridade = (*MaisEsq)->prioridade;
         
         RemoveNoGrau0ou1(MaisEsq, MaisBaixa); 
@@ -386,7 +387,7 @@ void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
     {
         if ((*AVL)->prioridade != prioridade && strcmp((*AVL)->ip, ip) != 0)
             {
-            if ((*AVL)->prioridade < prioridade)
+            if ((*AVL)->prioridade <= prioridade)
             {
                 RemoveNode(&((*AVL)->dir), ip, prioridade, MaisBaixa);
                 if ((*MaisBaixa == 1))
@@ -417,7 +418,7 @@ NodeAVL *CriaNode(char *ip, int prioridade)
 {
     NodeAVL *Node = (NodeAVL*)calloc(1, sizeof(NodeAVL));
     
-    Node->ip = strdup(ip);
+    strcpy(Node->ip, ip);
     Node->prioridade = prioridade;
     Node->altura = 0;
     Node->dir = Node->esq = NULL;
@@ -482,12 +483,18 @@ int AlturaAVL(NodeAVL *AVL)
         return 0;
 }
 
-bool AVLCheia(AVLTree *AVL)
+bool AVLCheia(NodeAVL *AVL)
 {
-    int Altura = AlturaAVL(AVL->raiz);
-    int MaxNodeCount = pow(2, Altura+1) - 1;
+    if (AVL == NULL)
+        return true;
     
-    return (AVL->size == MaxNodeCount);
+    if (AVL->esq == NULL && AVL->dir == NULL)
+        return true;
+    
+    if ((AVL->esq) && (AVL->dir))
+        return (AVLCheia(AVL->esq) && AVLCheia(AVL->dir));
+    
+    return false;
 }
 
 int MaiorRota(NodeAVL *AVL)
@@ -515,7 +522,7 @@ int main(int argc, char **argv)
     printf("[INFO] Apos construcao:\n");
     PrintConstruida(AVL->raiz);
     
-    if (AVLCheia(AVL))
+    if (AVLCheia(AVL->raiz))
         printf("Arvore esta cheia\n");
     else
         printf("Arvore nao esta cheia\n");
@@ -527,7 +534,7 @@ int main(int argc, char **argv)
     printf("\n[INFO] Apos atualizacao:\n");
     PrintConstruida(AVL->raiz);
 
-    if (AVLCheia(AVL))
+    if (AVLCheia(AVL->raiz))
         printf("Arvore esta cheia\n");
     else
         printf("Arvore nao esta cheia\n");
