@@ -202,7 +202,7 @@ NodeAVL *RemoveNode(NodeAVL *AVL, char *ip, int prioridade) {
     {
         AVL->esq = RemoveNode(AVL->esq, ip, prioridade);
     } 
-    else if (prioridade > AVL->prioridade) 
+    else if (prioridade >= AVL->prioridade) 
     {
         AVL->dir = RemoveNode(AVL->dir, ip, prioridade);
     } 
@@ -244,7 +244,7 @@ NodeAVL *RemoveNode(NodeAVL *AVL, char *ip, int prioridade) {
     AVL->altura = 1 + MAX(Altura(AVL->esq), Altura(AVL->dir));
     int balanco = PegaBalanco(AVL);
 
-    if (balanco > 1 && PegaBalanco(AVL->esq) >= 0)
+    if (balanco > 1 && PegaBalanco(AVL->esq) > 0)
         return RotacaoDireita(AVL);
 
     if (balanco > 1 && PegaBalanco(AVL->esq) < 0) {
@@ -252,7 +252,7 @@ NodeAVL *RemoveNode(NodeAVL *AVL, char *ip, int prioridade) {
         return RotacaoDireita(AVL);
     }
 
-    if (balanco < -1 && PegaBalanco(AVL->dir) <= 0)
+    if (balanco < -1 && PegaBalanco(AVL->dir) < 0)
         return RotacaoEsquerda(AVL);
 
     if (balanco < -1 && PegaBalanco(AVL->dir) > 0) {
@@ -300,7 +300,7 @@ void DestroiAVL(AVLTree **AVL)
 int main(int argc, char **argv)
 {
     AVLTree *AVL = NULL;
-    AVL = LeAVL("in/arq3.in1", AVL);
+    AVL = LeAVL("in/arq1.in1", AVL);
     
     printf("[INFO] Apos construcao:\n");
     PrintConstruida(AVL->raiz);
@@ -312,7 +312,7 @@ int main(int argc, char **argv)
 
     printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 
-    AVL = LeComandos("in/arq3.in2", AVL);
+    AVL = LeComandos("in/arq1.in2", AVL);
 
     printf("\n[INFO] Apos atualizacao:\n");
     PrintConstruida(AVL->raiz);
