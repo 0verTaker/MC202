@@ -56,7 +56,7 @@ NodeAVL *MenorValor(NodeAVL *AVL)
 AVLTree *LeAVL(char *nomearq, AVLTree *AVL)
 {
     int SizeAux, prioridade;
-    char ip[16];
+    char ip[20];
     
     FILE *fp = fopen(nomearq, "r");
     fscanf(fp, "%d\n", &SizeAux);
@@ -125,28 +125,24 @@ NodeAVL *RotacaoDireita(NodeAVL *Y)
     Y->esq = FilhoEsq->dir;
     FilhoEsq->dir = Y;
 
-    /* Atualiza a altura dos nós após a rotação */
     Y->altura = MAX(Altura(Y->esq), Altura(Y->dir)) + 1;
     FilhoEsq->altura = MAX(Altura(FilhoEsq->esq), Altura(FilhoEsq->dir)) + 1;
 
     return FilhoEsq; 
 }
 
-
 NodeAVL *RotacaoEsquerda(NodeAVL *X)
 {
-    NodeAVL *FilhoDir = X->dir; /* salva filho a esquerda */
+    NodeAVL *FilhoDir = X->dir;
 
     X->dir = FilhoDir->esq;
     FilhoDir->esq = X;
 
-    /* Atualiza a altura dos nós após a rotação */
     X->altura = MAX(Altura(X->esq), Altura(X->dir)) + 1;
     FilhoDir->altura = MAX(Altura(FilhoDir->esq), Altura(FilhoDir->dir)) + 1;
 
-    return FilhoDir; // Retorna o novo nó raiz após a rotação
+    return FilhoDir;
 }
-
 
 int PegaBalanco(NodeAVL *AVL)
 {
@@ -161,7 +157,7 @@ NodeAVL *InsereNode(NodeAVL *AVL, char *ip, int prioridade)
         return CriaNode(ip, prioridade);
     else
     {
-        if (prioridade <= AVL->prioridade)
+        if (prioridade < AVL->prioridade)
         {
           AVL->esq = InsereNode(AVL->esq, ip, prioridade);
         }

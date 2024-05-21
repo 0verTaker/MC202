@@ -505,6 +505,26 @@ void PrintConstruida(NodeAVL *AVL)
     }
 }
 
+void DestroiNode(NodeAVL *Node)
+{
+    if (Node != NULL)
+    {
+        DestroiNode(Node->esq);
+        DestroiNode(Node->dir);
+        //free(Node->ip);
+        free(Node);
+    }
+}
+
+void DestroiAVL(AVLTree **AVL)
+{
+    if (AVL != NULL && *AVL != NULL) {
+        DestroiNode((*AVL)->raiz);
+        free(*AVL);
+        *AVL = NULL;
+    }
+}
+
 int main(int argc, char **argv)
 {
     char MaisAlta = 0, MaisBaixa = 0;
@@ -534,5 +554,5 @@ int main(int argc, char **argv)
 
     printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
 
+    DestroiAVL(&AVL);
 }
-
