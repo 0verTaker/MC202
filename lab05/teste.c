@@ -8,7 +8,7 @@
 
 typedef struct _NodeAVL{
     int prioridade, altura;
-    char *ip;
+    char ip[20];
     struct _NodeAVL *esq, *dir; 
 }NodeAVL;
 
@@ -168,7 +168,7 @@ void TrataReducaoArvoreEsquerda(NodeAVL **AVL, char *MaisBaixa)
     switch(A->altura)
     {
         case 1:
-            if(B->altura >= 0)
+            if(B->altura > 0)
             {
                 RotacaoSimplesEsquerda(AVL);
                 AjusteBalancoRotacaoEsquerdaSimplesRemocao(A, B, MaisBaixa);
@@ -208,7 +208,7 @@ void AjusteBalancoDuplaInsercao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
         B->altura = 0;
         break;
 
-        case +1:
+        case 1:
         A->altura =  0;
         B->altura = -1;
         break;
@@ -306,13 +306,13 @@ void InsereNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisAlta)
     }
     else
     {
-        if ((*AVL)->prioridade <= prioridade)
+        if (prioridade >= (*AVL)->prioridade)
         {
             InsereNode(&((*AVL)->dir), ip, prioridade, MaisAlta);
             if (*MaisAlta == 1)
                 TrataAumentoArvoreDireita(AVL, MaisAlta);
         }
-        else
+        else if (prioridade < (*AVL)->prioridade)
         {
             InsereNode(&((*AVL)->esq), ip, prioridade, MaisAlta);
             if (*MaisAlta == 1)
@@ -351,7 +351,8 @@ void SubstituiRemoveMenorSucessor(NodeAVL **AVL, NodeAVL **MaisEsq, char *MaisBa
 {
     if ((*MaisEsq)->esq == NULL)
     {
-        (*AVL)->ip = (*MaisEsq)->ip;
+        //(*AVL)->ip = (*MaisEsq)->ip;
+        strcpy((*AVL)->ip, (*MaisEsq)->ip);
         (*AVL)->prioridade = (*MaisEsq)->prioridade;
         
         RemoveNoGrau0ou1(MaisEsq, MaisBaixa); 
@@ -386,20 +387,20 @@ void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
     {
         if ((*AVL)->prioridade != prioridade && strcmp((*AVL)->ip, ip) != 0)
             {
-            if ((*AVL)->prioridade <= prioridade)
+            if (prioridade >= (*AVL)->prioridade)
             {
                 RemoveNode(&((*AVL)->dir), ip, prioridade, MaisBaixa);
-                if ((*MaisBaixa) == 1)
+                if ((*MaisBaixa == 1))
                     TrataReducaoArvoreDireita(AVL, MaisBaixa);
             }
-            else
+            else if (prioridade < (*AVL)->prioridade)
             {
                 RemoveNode(&((*AVL)->esq), ip, prioridade, MaisBaixa);
-                if ((*MaisBaixa) == 1)
+                if ((*MaisBaixa == 1))
                     TrataReducaoArvoreEsquerda(AVL, MaisBaixa);
             }
         }
-        else if ((*AVL)->prioridade == prioridade && strcmp((*AVL)->ip, ip) == 0)
+        else 
             RemoveDeFato(AVL, MaisBaixa);
     }
 }
@@ -417,7 +418,7 @@ NodeAVL *CriaNode(char *ip, int prioridade)
 {
     NodeAVL *Node = (NodeAVL*)calloc(1, sizeof(NodeAVL));
     
-    Node->ip = strdup(ip);
+    strcpy(Node->ip, ip);
     Node->prioridade = prioridade;
     Node->altura = 0;
     Node->dir = Node->esq = NULL;
@@ -428,7 +429,7 @@ NodeAVL *CriaNode(char *ip, int prioridade)
 void LeAVL(char *nomearq, AVLTree **AVL, char *MaisAlta)
 {
     int SizeAux, prioridade;
-    char ip[16];
+    char ip[20];
     
     FILE *fp = fopen(nomearq, "r");
     fscanf(fp, "%d\n", &SizeAux);
@@ -482,12 +483,18 @@ int AlturaAVL(NodeAVL *AVL)
         return 0;
 }
 
-bool AVLCheia(AVLTree *AVL)
+bool AVLCheia(NodeAVL *AVL)
 {
-    int Altura = AlturaAVL(AVL->raiz);
-    int MaxNodeCount = pow(2, Altura+1) - 1;
+    if (AVL == NULL)
+        return true;
     
-    return (AVL->size == MaxNodeCount);
+    if (AVL->esq == NULL && AVL->dir == NULL)
+        return true;
+    
+    if ((AVL->esq) && (AVL->dir))
+        return (AVLCheia(AVL->esq) && AVLCheia(AVL->dir));
+    
+    return false;
 }
 
 int MaiorRota(NodeAVL *AVL)
@@ -505,34 +512,54 @@ void PrintConstruida(NodeAVL *AVL)
     }
 }
 
+void DestroiNode(NodeAVL *Node)
+{
+    if (Node != NULL)
+    {
+        DestroiNode(Node->esq);
+        DestroiNode(Node->dir);
+        //free(Node->ip);
+        free(Node);
+    }
+}
+
+void DestroiAVL(AVLTree **AVL)
+{
+    if (AVL != NULL && *AVL != NULL) {
+        DestroiNode((*AVL)->raiz);
+        free(*AVL);
+        *AVL = NULL;
+    }
+}
+
 int main(int argc, char **argv)
 {
     char MaisAlta = 0, MaisBaixa = 0;
     AVLTree *AVL = NULL;
     
-    LeAVL("in/arq1.in1", &AVL, &MaisAlta);
+    LeAVL(argv[1], &AVL, &MaisAlta);
     
     printf("[INFO] Apos construcao:\n");
     PrintConstruida(AVL->raiz);
     
-    if (AVLCheia(AVL))
+    if (AVLCheia(AVL->raiz))
         printf("Arvore esta cheia\n");
     else
         printf("Arvore nao esta cheia\n");
 
-    printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
+    printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 
-    LeComandos("in/arq1.in2", &AVL, &MaisAlta, &MaisBaixa);
+    LeComandos(argv[2], &AVL, &MaisAlta, &MaisBaixa);
 
     printf("\n[INFO] Apos atualizacao:\n");
     PrintConstruida(AVL->raiz);
 
-    if (AVLCheia(AVL))
+    if (AVLCheia(AVL->raiz))
         printf("Arvore esta cheia\n");
     else
         printf("Arvore nao esta cheia\n");
 
-    printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
+    printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 
+    DestroiAVL(&AVL);
 }
-
