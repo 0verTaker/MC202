@@ -312,7 +312,7 @@ void InsereNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisAlta)
             if (*MaisAlta == 1)
                 TrataAumentoArvoreDireita(AVL, MaisAlta);
         }
-        else if (prioridade < (*AVL)->prioridade)
+        else //if (prioridade <= (*AVL)->prioridade)
         {
             InsereNode(&((*AVL)->esq), ip, prioridade, MaisAlta);
             if (*MaisAlta == 1)
@@ -393,7 +393,7 @@ void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
                 if ((*MaisBaixa == 1))
                     TrataReducaoArvoreDireita(AVL, MaisBaixa);
             }
-            else if (prioridade < (*AVL)->prioridade)
+            else //if (prioridade <= (*AVL)->prioridade)
             {
                 RemoveNode(&((*AVL)->esq), ip, prioridade, MaisBaixa);
                 if ((*MaisBaixa == 1))

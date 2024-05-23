@@ -277,25 +277,7 @@ bool AVLCheia(NodeAVL *AVL)
     return false;
 }
 
-void DestroiNode(NodeAVL *Node)
-{
-    if (Node != NULL)
-    {
-        DestroiNode(Node->esq);
-        DestroiNode(Node->dir);
-        //free(Node->ip);
-        free(Node);
-    }
-}
 
-void DestroiAVL(AVLTree **AVL)
-{
-    if (AVL != NULL && *AVL != NULL) {
-        DestroiNode((*AVL)->raiz);
-        free(*AVL);
-        *AVL = NULL;
-    }
-}
 
 int main(int argc, char **argv)
 {
