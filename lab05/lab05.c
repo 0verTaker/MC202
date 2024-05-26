@@ -65,7 +65,7 @@ void TrataAumentoArvoreDireita(NodeAVL **AVL, char *MaisAlta)
     switch (A->altura)
     {
         case 1:
-            if (B->altura == 1) //perdeu balanço
+            if (B->altura == 1)
             {
                 RotacaoSimplesEsquerda(AVL);
                 AjusteBalancoSimplesInsercao(A,B);
@@ -350,7 +350,6 @@ void SubstituiRemoveMenorSucessor(NodeAVL **AVL, NodeAVL **MaisEsq, char *MaisBa
 {
     if ((*MaisEsq)->esq == NULL)
     {
-        //(*AVL)->ip = (*MaisEsq)->ip;
         strcpy((*AVL)->ip, (*MaisEsq)->ip);
         (*AVL)->prioridade = (*MaisEsq)->prioridade;
         
@@ -438,7 +437,6 @@ void LeAVL(char *nomearq, AVLTree **AVL, char *MaisAlta)
     for (int i = 0; i < SizeAux; i++)
     {
         fscanf(fp, "%s %d\n ", ip, &prioridade);
-        //NodeAVL *NewNode = CriaNode(ip, prioridade);
         InsereNode(&(*AVL)->raiz, ip, prioridade, MaisAlta);
     }
 
@@ -457,16 +455,10 @@ void LeComandos(char *nomearq, AVLTree **AVL, char *MaisAlta, char *MaisBaixa)
     {
         fscanf(fp, "%d %s %d\n ", &cmd, ip, &prioridade);
 
-        //printf("cmd: %d, ip: %s, p: %d\n", cmd, ip, prioridade);
         if (cmd == 1)
             InsereNode(&(*AVL)->raiz, ip, prioridade, MaisAlta);
-            //printf("1\n");
         else
-        {
             RemoveNode(&(*AVL)->raiz, ip, prioridade, MaisBaixa);
-            //printf("-1\n");
-        }
-
     }
 
     fclose(fp);
@@ -511,32 +503,49 @@ void PrintConstruida(NodeAVL *AVL)
     }
 }
 
+void PrintaTudo(AVLTree **AVL)
+{
+    PrintConstruida((*AVL)->raiz);
+    
+    if (AVLCheia((*AVL)->raiz))
+        printf("Arvore esta cheia\n");
+    else
+        printf("Arvore nao esta cheia\n");
+
+    printf("A rota mais longa possivel passa por %d nos\n", MaiorRota((*AVL)->raiz));
+}
+
+void DestroiNode(NodeAVL *Node)
+{
+    if (Node != NULL)
+    {
+        DestroiNode(Node->esq);
+        DestroiNode(Node->dir);
+        free(Node);
+    }
+}
+
+void DestroiAVL(AVLTree **AVL)
+{
+    if (AVL != NULL && *AVL != NULL) {
+        DestroiNode((*AVL)->raiz);
+        free(*AVL);
+        *AVL = NULL;
+    }
+}
+
 int main(int argc, char **argv)
 {
     char MaisAlta = 0, MaisBaixa = 0;
     AVLTree *AVL = NULL;
     
     LeAVL(argv[1], &AVL, &MaisAlta);
-    
     printf("[INFO] Apos construcao:\n");
-    PrintConstruida(AVL->raiz);
+    PrintaTudo(&AVL);
     
-    if (AVLCheia(AVL->raiz))
-        printf("Arvore esta cheia\n");
-    else
-        printf("Arvore nao esta cheia\n");
-
-    printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
-
     LeComandos(argv[2], &AVL, &MaisAlta, &MaisBaixa);
-
     printf("\n[INFO] Apos atualizacao:\n");
-    PrintConstruida(AVL->raiz);
+    PrintaTudo(&AVL);
 
-    if (AVLCheia(AVL->raiz))
-        printf("Arvore esta cheia\n");
-    else
-        printf("Arvore nao esta cheia\n");
-
-    printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
+    DestroiAVL(&AVL);
 }

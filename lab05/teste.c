@@ -6,6 +6,7 @@
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
+
 typedef struct _NodeAVL{
     int prioridade, altura;
     char ip[20];
@@ -17,393 +18,9 @@ typedef struct _AVLTree{
     NodeAVL *raiz;
 }AVLTree;
 
-NodeAVL *CriaNode(char *ip, int prioridade);
-void AjusteBalancoDuplaInsercao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
-void AjusteBalancoSimplesInsercao(NodeAVL *A, NodeAVL *B);
-void AjusteBalancoRotacaoEsquerdaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa);
-void AjusteBalancoRotacaoDireitaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa);
-void AjusteBalancoRotacaoEsquerdaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
-void AjusteBalancoRotacaoDireitaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C);
-void PrintConstruida(NodeAVL *AVL);
-
-void RotacaoSimplesEsquerda(NodeAVL **AVL)
-{
-    NodeAVL *FilhoDir = (*AVL)->dir;
-    
-    (*AVL)->dir = FilhoDir->esq;
-    FilhoDir->esq = (*AVL);
-    (*AVL) = FilhoDir;
-}
-
-void RotacaoSimplesDireita(NodeAVL **AVL)
-{
-    NodeAVL *FilhoEsq = (*AVL)->esq;
-    
-    (*AVL)->esq = FilhoEsq->dir;
-    FilhoEsq->dir = (*AVL);
-    (*AVL) = FilhoEsq;
-}
-
-void RotacaoDuplaEsquerda(NodeAVL **AVL)
-{
-    RotacaoSimplesDireita(&(*AVL)->dir);
-    RotacaoSimplesEsquerda(AVL);
-}
-
-void RotacaoDuplaDireita(NodeAVL **AVL)
-{
-    RotacaoSimplesEsquerda(&(*AVL)->esq);
-    RotacaoSimplesDireita(AVL);
-}
-
-void TrataAumentoArvoreDireita(NodeAVL **AVL, char *MaisAlta)
-{
-    NodeAVL *A, *B, *C;
-    A = (*AVL);
-    B = (*AVL)->dir;
-    C = B->esq;
-
-    switch (A->altura)
-    {
-        case 1:
-            if (B->altura == 1) //perdeu balanço
-            {
-                RotacaoSimplesEsquerda(AVL);
-                AjusteBalancoSimplesInsercao(A,B);
-            }
-            else
-            {
-                RotacaoDuplaEsquerda(AVL);
-                AjusteBalancoDuplaInsercao(B,A,C);
-            }
-            *MaisAlta = 0;
-            break;
-        
-        case 0:
-            A->altura = 1;
-            (*MaisAlta) = 1; 	
-            break;
-        
-        case -1:
-            A->altura = 0;
-            (*MaisAlta) = 0; 	
-            break;
-    }
-}
-
-void TrataAumentoArvoreEsquerda(NodeAVL **AVL, char *MaisAlta)
-{
-    NodeAVL *A, *B, *C;
-    A = (*AVL);
-    B = (*AVL)->esq;
-    C = B->dir;
-
-    switch (A->altura)
-    {
-        case -1:
-            if (B->altura == -1){
-                RotacaoSimplesDireita(AVL);
-                AjusteBalancoSimplesInsercao(A,B);
-            }
-            else
-            {
-                RotacaoDuplaDireita(AVL);
-                AjusteBalancoDuplaInsercao(A,B,C); 
-            }
-            (*MaisAlta) = 0;
-            break;
-        case 0:
-            (*AVL)->altura = -1;
-            (*MaisAlta) = 1; 
-            break;
-        case 1:
-            (*AVL)->altura = 0;
-            (*MaisAlta) =  0;
-            break;
-    }
-}
-
-void TrataReducaoArvoreDireita(NodeAVL **AVL, char *MaisBaixa)
-{
-    NodeAVL *A,*B,*C;
-    A = (*AVL); 
-    B = (*AVL)->esq;
-
-    switch(A->altura)
-    {
-        case -1:
-            if (B->altura <= 0)
-            {
-                RotacaoSimplesDireita(AVL);
-                AjusteBalancoRotacaoDireitaSimplesRemocao(A, B, MaisBaixa); 
-            }
-            else
-            {
-                C = B->dir;
-                RotacaoDuplaDireita(AVL);
-                AjusteBalancoRotacaoDireitaDuplaRemocao(A, B, C);
-                (*MaisBaixa) =  1;
-            }
-            break;
-        
-        case 0:
-            (*AVL)->altura = -1;
-            (*MaisBaixa) = 0;
-            break; 
-
-        case 1:
-            (*AVL)->altura = 0;
-            (*MaisBaixa) = 1;
-            break;   
-    }
-}
-
-void TrataReducaoArvoreEsquerda(NodeAVL **AVL, char *MaisBaixa)
-{
-    NodeAVL *A,*B,*C;
-    
-  A = (*AVL); 
-  B = (*AVL)->dir;
-
-    switch(A->altura)
-    {
-        case 1:
-            if(B->altura > 0)
-            {
-                RotacaoSimplesEsquerda(AVL);
-                AjusteBalancoRotacaoEsquerdaSimplesRemocao(A, B, MaisBaixa);
-            }
-            else
-            {
-                C = B->esq;
-                RotacaoDuplaEsquerda(AVL);
-                AjusteBalancoRotacaoEsquerdaDuplaRemocao(A, B, C);
-                (*MaisBaixa) =  1;
-            }
-            break;
-        
-        case 0:
-            A->altura = 1;    
-            (*MaisBaixa) = 0;
-            break;
-
-        case -1:
-            A->altura = 0;  
-            (*MaisBaixa) =  1;
-            break;
-    }
-}
-
-void AjusteBalancoDuplaInsercao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
-{
-    switch (C->altura)
-    {
-        case -1:
-        A->altura = 1;
-        B->altura = 0;
-        break;
-
-        case 0:
-        A->altura = 0;
-        B->altura = 0;
-        break;
-
-        case 1:
-        A->altura =  0;
-        B->altura = -1;
-        break;
-    }
-    C->altura = 0;
-}
-
-void AjusteBalancoSimplesInsercao(NodeAVL *A, NodeAVL *B)
-{
-    A->altura = 0;
-    B->altura = 0;
-}
-
-void AjusteBalancoRotacaoDireitaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
-{
-    switch(C->altura) {
-        case -1:
-            A->altura = 1;
-            B->altura = 0;
-            break;
-        
-        case 0:
-            A->altura =  0;
-            B->altura =  0;
-            break;
-        
-        case +1:
-            A->altura =  0;
-            B->altura = -1;
-            break;
-        }
-        C->altura = 0;
-}
-
-void AjusteBalancoRotacaoEsquerdaDuplaRemocao(NodeAVL *A, NodeAVL *B, NodeAVL *C)
-{
-    switch(C->altura) 
-    {
-        case -1:
-            A->altura = 0;
-            B->altura = 1;
-            break;
-        
-        case 0:
-            A->altura = 0;
-            B->altura = 0;
-            break;
-        
-        case +1:
-            A->altura = -1;
-            B->altura =  0;
-            break;
-    }
-        C->altura = 0;
-}
-
-void AjusteBalancoRotacaoDireitaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa)
-{
-    if (B->altura == -1)
-    { 
-        A->altura =  0;
-        B->altura =  0;
-        *MaisBaixa = 1;
-    } 
-    else 
-    {
-        A->altura = -1;
-        B->altura =  1;
-        *MaisBaixa = 0;
-    }
-}
-
-void AjusteBalancoRotacaoEsquerdaSimplesRemocao(NodeAVL *A, NodeAVL *B, char *MaisBaixa)
-{
-    if (B->altura == 1)
-    { 
-        A->altura =  0;
-        B->altura =  0;
-        *MaisBaixa = 1;
-    } 
-    else 
-    { 
-        A->altura =  1;
-        B->altura = -1;
-        *MaisBaixa = 0;
-    }
-}
-
-void InsereNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisAlta)
-{
-    if ((*AVL) == NULL)
-    {
-        (*AVL) = CriaNode(ip, prioridade);
-        *MaisAlta = 1;
-    }
-    else
-    {
-        if (prioridade >= (*AVL)->prioridade)
-        {
-            InsereNode(&((*AVL)->dir), ip, prioridade, MaisAlta);
-            if (*MaisAlta == 1)
-                TrataAumentoArvoreDireita(AVL, MaisAlta);
-        }
-        else //if (prioridade <= (*AVL)->prioridade)
-        {
-            InsereNode(&((*AVL)->esq), ip, prioridade, MaisAlta);
-            if (*MaisAlta == 1)
-                TrataAumentoArvoreEsquerda(AVL, MaisAlta);
-        }
-    }
-}
-
-char RemoveNoGrau0ou1(NodeAVL **AVL, char *MaisBaixa)
-{
-    NodeAVL *aux;
-
-    if ((*AVL)->esq == NULL)
-    {
-        aux = (*AVL);
-        (*AVL) = (*AVL)->dir;
-        free(aux);
-    }
-    else
-    {
-        if ((*AVL)->dir == NULL)
-        {
-            aux = (*AVL);
-            (*AVL) = (*AVL)->esq;
-            free(aux);
-        }
-        else
-            return 0;
-    }
-    (*MaisBaixa) = 1;
-
-    return 1;
-}
-
-void SubstituiRemoveMenorSucessor(NodeAVL **AVL, NodeAVL **MaisEsq, char *MaisBaixa)
-{
-    if ((*MaisEsq)->esq == NULL)
-    {
-        //(*AVL)->ip = (*MaisEsq)->ip;
-        strcpy((*AVL)->ip, (*MaisEsq)->ip);
-        (*AVL)->prioridade = (*MaisEsq)->prioridade;
-        
-        RemoveNoGrau0ou1(MaisEsq, MaisBaixa); 
-    }
-    else
-    {
-        SubstituiRemoveMenorSucessor(AVL, &((*MaisEsq)->esq), MaisBaixa);
-
-        if ((*MaisBaixa))
-            TrataReducaoArvoreEsquerda(MaisEsq, MaisBaixa);
-    }
-}
-
-void RemoveDeFato(NodeAVL **AVL, char *MaisBaixa)
-{
-    int bal;
-
-    if (RemoveNoGrau0ou1(AVL, MaisBaixa) == 0)
-    {
-        bal = (*AVL)->altura;
-        SubstituiRemoveMenorSucessor(AVL, &((*AVL)->dir), MaisBaixa);
-        (*AVL)->altura = bal;
-
-        if ((*MaisBaixa))
-            TrataReducaoArvoreDireita(AVL, MaisBaixa);
-    }
-}
-
-void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
-{
-    if ((*AVL) != NULL)
-    {
-        if ((*AVL)->prioridade != prioridade && strcmp((*AVL)->ip, ip) != 0)
-            {
-            if (prioridade >= (*AVL)->prioridade)
-            {
-                RemoveNode(&((*AVL)->dir), ip, prioridade, MaisBaixa);
-                if ((*MaisBaixa == 1))
-                    TrataReducaoArvoreDireita(AVL, MaisBaixa);
-            }
-            else //if (prioridade <= (*AVL)->prioridade)
-            {
-                RemoveNode(&((*AVL)->esq), ip, prioridade, MaisBaixa);
-                if ((*MaisBaixa == 1))
-                    TrataReducaoArvoreEsquerda(AVL, MaisBaixa);
-            }
-        }
-        else 
-            RemoveDeFato(AVL, MaisBaixa);
-    }
-}
+NodeAVL *InsereNode(NodeAVL *AVL, char *ip, int prioridade);
+NodeAVL *RemoveNode(NodeAVL *AVL, char *ip, int prioridade);
+int Altura(NodeAVL *AVL);
 
 AVLTree *CriaAVL(int size)
 {
@@ -420,13 +37,23 @@ NodeAVL *CriaNode(char *ip, int prioridade)
     
     strcpy(Node->ip, ip);
     Node->prioridade = prioridade;
-    Node->altura = 0;
+    Node->altura = 1;
     Node->dir = Node->esq = NULL;
 
     return Node;
 }
 
-void LeAVL(char *nomearq, AVLTree **AVL, char *MaisAlta)
+NodeAVL *MenorValor(NodeAVL *AVL)
+{
+    NodeAVL *atual = AVL;
+
+    while (atual->esq != NULL)
+        atual = atual->esq;
+
+    return atual;
+}
+
+AVLTree *LeAVL(char *nomearq, AVLTree *AVL)
 {
     int SizeAux, prioridade;
     char ip[20];
@@ -434,19 +61,20 @@ void LeAVL(char *nomearq, AVLTree **AVL, char *MaisAlta)
     FILE *fp = fopen(nomearq, "r");
     fscanf(fp, "%d\n", &SizeAux);
     
-    (*AVL) = CriaAVL(SizeAux);
+    AVL = CriaAVL(SizeAux);
 
     for (int i = 0; i < SizeAux; i++)
     {
         fscanf(fp, "%s %d\n ", ip, &prioridade);
         //NodeAVL *NewNode = CriaNode(ip, prioridade);
-        InsereNode(&(*AVL)->raiz, ip, prioridade, MaisAlta);
+        AVL->raiz = InsereNode(AVL->raiz, ip, prioridade);
     }
-
     fclose(fp);
+
+    return AVL;
 }
 
-void LeComandos(char *nomearq, AVLTree **AVL, char *MaisAlta, char *MaisBaixa)
+AVLTree *LeComandos(char *nomearq, AVLTree *AVL)
 {
     int QntCmd, prioridade, cmd;
     char ip[20];
@@ -458,29 +86,181 @@ void LeComandos(char *nomearq, AVLTree **AVL, char *MaisAlta, char *MaisBaixa)
     {
         fscanf(fp, "%d %s %d\n ", &cmd, ip, &prioridade);
 
-        //printf("cmd: %d, ip: %s, p: %d\n", cmd, ip, prioridade);
         if (cmd == 1)
-            InsereNode(&(*AVL)->raiz, ip, prioridade, MaisAlta);
-            //printf("1\n");
+            AVL->raiz = InsereNode(AVL->raiz, ip, prioridade);
         else
-        {
-            RemoveNode(&(*AVL)->raiz, ip, prioridade, MaisBaixa);
-            //printf("-1\n");
-        }
-
+            AVL->raiz = RemoveNode(AVL->raiz, ip, prioridade);
     }
 
     fclose(fp);
+    return AVL;
 }
 
-int AlturaAVL(NodeAVL *AVL)
+int MaiorRota(NodeAVL *AVL)
+{
+    return (Altura(AVL->esq) + Altura(AVL->dir)) + 1;
+}
+
+void PrintConstruida(NodeAVL *AVL)
 {
     if (AVL != NULL)
     {
-        return 1 + MAX(AlturaAVL((AVL->esq)), AlturaAVL(AVL->dir));
+        printf("- %s: %d\n", AVL->ip, AVL->prioridade);
+        PrintConstruida(AVL->esq);
+        PrintConstruida(AVL->dir);
     }
-    else
+}
+
+int Altura(NodeAVL *AVL)
+{
+    if (AVL == NULL)
         return 0;
+    return AVL->altura;
+}
+
+NodeAVL *RotacaoDireita(NodeAVL *Y)
+{
+    NodeAVL *FilhoEsq = Y->esq;
+
+    Y->esq = FilhoEsq->dir;
+    FilhoEsq->dir = Y;
+
+    Y->altura = MAX(Altura(Y->esq), Altura(Y->dir)) + 1;
+    FilhoEsq->altura = MAX(Altura(FilhoEsq->esq), Altura(FilhoEsq->dir)) + 1;
+
+    return FilhoEsq; 
+}
+
+NodeAVL *RotacaoEsquerda(NodeAVL *X)
+{
+    NodeAVL *FilhoDir = X->dir;
+
+    X->dir = FilhoDir->esq;
+    FilhoDir->esq = X;
+
+    X->altura = MAX(Altura(X->esq), Altura(X->dir)) + 1;
+    FilhoDir->altura = MAX(Altura(FilhoDir->esq), Altura(FilhoDir->dir)) + 1;
+
+    return FilhoDir;
+}
+
+int PegaBalanco(NodeAVL *AVL)
+{
+    if (AVL == NULL)
+        return 0;
+    return Altura(AVL->esq) - Altura(AVL->dir);
+}
+
+NodeAVL *InsereNode(NodeAVL *AVL, char *ip, int prioridade)
+{
+    if (AVL == NULL)
+        return CriaNode(ip, prioridade);
+    else
+    {
+        if (prioridade < AVL->prioridade)
+        {
+          AVL->esq = InsereNode(AVL->esq, ip, prioridade);
+        }
+        else if (prioridade >= AVL->prioridade)
+        {
+            AVL->dir = InsereNode(AVL->dir, ip, prioridade);
+        }
+        else
+            return AVL;
+    }
+
+    AVL->altura = 1 + MAX(Altura(AVL->esq), Altura(AVL->dir));
+
+    int balanco = PegaBalanco(AVL); 
+
+    if (balanco > 1 && prioridade <= AVL->esq->prioridade)
+        return RotacaoDireita(AVL);
+
+    if (balanco < -1 && prioridade >= AVL->dir->prioridade)
+        return RotacaoEsquerda(AVL);
+    
+    if (balanco > 1 && prioridade >= AVL->esq->prioridade)
+    {
+        AVL->esq = RotacaoEsquerda(AVL->esq);
+        return RotacaoDireita(AVL);
+    }
+
+    if (balanco < -1 && prioridade <= AVL->dir->prioridade)
+    {
+        AVL->dir = RotacaoDireita(AVL->dir);
+        return RotacaoEsquerda(AVL);
+    }
+    
+    return AVL;
+}
+
+NodeAVL *RemoveNode(NodeAVL *AVL, char *ip, int prioridade) {
+    if (AVL == NULL)
+        return AVL;
+
+    if (prioridade < AVL->prioridade) 
+    {
+        AVL->esq = RemoveNode(AVL->esq, ip, prioridade);
+    } 
+    else if (prioridade >= AVL->prioridade) 
+    {
+        AVL->dir = RemoveNode(AVL->dir, ip, prioridade);
+    } 
+    else 
+    {
+        if (strcmp(AVL->ip, ip) == 0) {
+            if (AVL->esq == NULL || AVL->dir == NULL) {
+                NodeAVL *temp = AVL->esq ? AVL->esq : AVL->dir;
+
+                if (temp == NULL) 
+                {
+                    temp = AVL;
+                    AVL = NULL;
+                } 
+                else 
+                {
+                    *AVL = *temp;  
+                }
+                free(temp);
+            } 
+            else 
+            {
+                NodeAVL *temp = MenorValor(AVL->dir);
+                //AVL->ip = strdup(temp->ip);
+                strcpy(AVL->ip, temp->ip); 
+                AVL->prioridade = temp->prioridade;
+                AVL->dir = RemoveNode(AVL->dir, temp->ip, temp->prioridade);
+            }
+        } 
+        else 
+        {
+            return AVL;
+        }
+    }
+
+    if (AVL == NULL)
+        return AVL;
+
+    AVL->altura = 1 + MAX(Altura(AVL->esq), Altura(AVL->dir));
+    int balanco = PegaBalanco(AVL);
+
+    if (balanco > 1 && PegaBalanco(AVL->esq) > 0)
+        return RotacaoDireita(AVL);
+
+    if (balanco > 1 && PegaBalanco(AVL->esq) < 0) {
+        AVL->esq = RotacaoEsquerda(AVL->esq);
+        return RotacaoDireita(AVL);
+    }
+
+    if (balanco < -1 && PegaBalanco(AVL->dir) < 0)
+        return RotacaoEsquerda(AVL);
+
+    if (balanco < -1 && PegaBalanco(AVL->dir) > 0) {
+        AVL->dir = RotacaoDireita(AVL->dir);
+        return RotacaoEsquerda(AVL);
+    }
+
+    return AVL;
 }
 
 bool AVLCheia(NodeAVL *AVL)
@@ -497,47 +277,10 @@ bool AVLCheia(NodeAVL *AVL)
     return false;
 }
 
-int MaiorRota(NodeAVL *AVL)
-{
-    return (AlturaAVL(AVL->esq) + AlturaAVL(AVL->dir)) + 1;
-}
-
-void PrintConstruida(NodeAVL *AVL)
-{
-    if (AVL != NULL)
-    {
-        printf("- %s: %d\n", AVL->ip, AVL->prioridade);
-        PrintConstruida(AVL->esq);
-        PrintConstruida(AVL->dir);
-    }
-}
-
-void DestroiNode(NodeAVL *Node)
-{
-    if (Node != NULL)
-    {
-        DestroiNode(Node->esq);
-        DestroiNode(Node->dir);
-        //free(Node->ip);
-        free(Node);
-    }
-}
-
-void DestroiAVL(AVLTree **AVL)
-{
-    if (AVL != NULL && *AVL != NULL) {
-        DestroiNode((*AVL)->raiz);
-        free(*AVL);
-        *AVL = NULL;
-    }
-}
-
 int main(int argc, char **argv)
 {
-    char MaisAlta = 0, MaisBaixa = 0;
     AVLTree *AVL = NULL;
-    
-    LeAVL(argv[1], &AVL, &MaisAlta);
+    AVL = LeAVL("in/arq1.in1", AVL);
     
     printf("[INFO] Apos construcao:\n");
     PrintConstruida(AVL->raiz);
@@ -549,7 +292,7 @@ int main(int argc, char **argv)
 
     printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 
-    LeComandos(argv[2], &AVL, &MaisAlta, &MaisBaixa);
+    AVL = LeComandos("in/arq1.in2", AVL);
 
     printf("\n[INFO] Apos atualizacao:\n");
     PrintConstruida(AVL->raiz);
@@ -561,5 +304,5 @@ int main(int argc, char **argv)
 
     printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 
-    DestroiAVL(&AVL);
+    //DestroiAVL(&AVL);
 }
