@@ -277,8 +277,6 @@ bool AVLCheia(NodeAVL *AVL)
     return false;
 }
 
-
-
 int main(int argc, char **argv)
 {
     AVLTree *AVL = NULL;
@@ -306,5 +304,5 @@ int main(int argc, char **argv)
 
     printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 
-    DestroiAVL(&AVL);
+    //DestroiAVL(&AVL);
 }

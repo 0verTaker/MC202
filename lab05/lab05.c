@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <math.h>
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
@@ -385,7 +384,7 @@ void RemoveNode(NodeAVL **AVL, char *ip, int prioridade, char *MaisBaixa)
 {
     if ((*AVL) != NULL)
     {
-        if ((*AVL)->prioridade != prioridade && strcmp((*AVL)->ip, ip) != 0)
+        if ((*AVL)->prioridade != prioridade || strcmp((*AVL)->ip, ip) != 0)
             {
             if ((*AVL)->prioridade <= prioridade)
             {
@@ -512,26 +511,6 @@ void PrintConstruida(NodeAVL *AVL)
     }
 }
 
-void DestroiNode(NodeAVL *Node)
-{
-    if (Node != NULL)
-    {
-        DestroiNode(Node->esq);
-        DestroiNode(Node->dir);
-        //free(Node->ip);
-        free(Node);
-    }
-}
-
-void DestroiAVL(AVLTree **AVL)
-{
-    if (AVL != NULL && *AVL != NULL) {
-        DestroiNode((*AVL)->raiz);
-        free(*AVL);
-        *AVL = NULL;
-    }
-}
-
 int main(int argc, char **argv)
 {
     char MaisAlta = 0, MaisBaixa = 0;
@@ -547,7 +526,7 @@ int main(int argc, char **argv)
     else
         printf("Arvore nao esta cheia\n");
 
-    printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
+    printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 
     LeComandos(argv[2], &AVL, &MaisAlta, &MaisBaixa);
 
@@ -559,7 +538,5 @@ int main(int argc, char **argv)
     else
         printf("Arvore nao esta cheia\n");
 
-    printf("A rota mais longa possível passa por %d nos\n", MaiorRota(AVL->raiz));
-
-    DestroiAVL(&AVL);
+    printf("A rota mais longa possivel passa por %d nos\n", MaiorRota(AVL->raiz));
 }
