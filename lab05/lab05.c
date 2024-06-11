@@ -548,4 +548,6 @@ int main(int argc, char **argv)
     PrintaTudo(&AVL);
 
     DestroiAVL(&AVL);
+
+    return 0;
 }
