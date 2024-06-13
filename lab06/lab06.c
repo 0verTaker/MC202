@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <math.h>
+
+#define Pai(i) ((i-1)/2)
+#define FilhoEsquerdo(i) (2*i+1)
+#define FilhoDireito(i) (2*i+2)
 
 typedef struct _NodeHeap
 {
@@ -35,6 +40,27 @@ bool HeapCheio(Heap **MaxHeap)
         return false;
 }
 
+void Troca(NodeHeap *A, NodeHeap *B)
+{
+    NodeHeap *aux = A;
+    A = B;
+    B = aux;
+}
+
+void SobeHeap(Heap **MaxHeap, int i)
+{
+   int pai;
+   pai = Pai(i);
+
+   while ((pai >= 0) && ((*MaxHeap)->info[pai].prioridade < (*MaxHeap)->info[i].prioridade))
+   {
+    Troca(&(*MaxHeap)->info[i], &(*MaxHeap)->info[pai]);
+    i = pai;
+    pai = Pai(i);
+   }
+
+}
+
 void InsereHeap(Heap **MaxHeap, char *ip, int prioridade, float latencia)
 {
     if (!HeapCheio(MaxHeap))
@@ -43,12 +69,8 @@ void InsereHeap(Heap **MaxHeap, char *ip, int prioridade, float latencia)
         strcpy((*MaxHeap)->info[(*MaxHeap)->NumElems-1].ip, ip);
         (*MaxHeap)->info[(*MaxHeap)->NumElems-1].prioridade = prioridade;
         (*MaxHeap)->info[(*MaxHeap)->NumElems-1].latencia = latencia;
+        SobeHeap(MaxHeap, (*MaxHeap)->NumElems-1);
     }
-}
-
-void Sobeheap(Heap **MAxHeap)
-{
-    
 }
 
 void LeHeap(char *nomearq, Heap **MaxHeap)
@@ -58,24 +80,44 @@ void LeHeap(char *nomearq, Heap **MaxHeap)
     float AuxLatencia;
     
     FILE *fp = fopen(nomearq, "r");
-    fsacnf(fp, "%d\n", &QntIp);
+    fscanf(fp, "%d\n", &QntIp);
     
     (*MaxHeap) = CriaHeap(QntIp);
     
     for (int i = 0; i < QntIp; i++)
     {
         fscanf(fp, "%s %d %f\n ", ip, &prioridade, &AuxLatencia);
-        InsereHeap(&(*MaxHeap)->info, ip, prioridade, AuxLatencia);
-        SobeHeap(MaxHeap);
+        printf("%s %d %.2f\n", ip, prioridade, AuxLatencia);
+        InsereHeap(MaxHeap, ip, prioridade, AuxLatencia);
+        //SobeHeap(MaxHeap, i);
     }
 
     fclose(fp);
 }
 
+void PrintMAxHeap(Heap *MaxHeap, int indice, int nivel)
+{
+    int i;
+
+    if (indice < MaxHeap->NumElems)
+    {
+        PrintMAxHeap(MaxHeap, FilhoDireito(indice), nivel + 1);
+        for (i = 0; i < nivel; i++)
+            printf("   ");
+        printf("%03d",MaxHeap->info[indice].ip);
+        for (i = 0; i <= (int)log2(MaxHeap->NumElems) - nivel; i++)
+            printf("---");
+        printf("\n");
+        PrintMAxHeap(MaxHeap, FilhoEsquerdo(indice), nivel + 1);
+    }
+}
+
 int main(int argc, char **argv)
 {
     Heap *MaxHeap = NULL; 
-    LeHeap(argv[1], &MaxHeap);
+    
+    LeHeap("in/arq1.in", &MaxHeap);
+    PrintMAxHeap(MaxHeap, 0, 1);
     
     return 0;
 }

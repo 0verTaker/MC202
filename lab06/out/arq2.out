@@ -1,0 +1,34 @@
+1) Sequencia Lida
+89.245.69.55 3 0.10
+230.214.26.174 1 0.30
+18.60.67.64 2 0.20
+209.152.184.227 3 0.05
+118.235.28.74 7 0.01
+
+2) Heap maximo construido
+Imprimindo heap
+                  [2](18.60.67.64)[0.20]---
+         [7](118.235.28.74)[0.01]------
+                           [1](230.214.26.174)[0.30]
+                  [3](209.152.184.227)[0.05]---
+                           [3](89.245.69.55)[0.10]
+3) Removendo elementos do heap por ordem de prioridade e restricao de latencia
+Removido elemento de prioridade 7 com valor de latencia 0.010000 e valor de IP 118.235.28.74
+Imprimindo heap
+                  [2](18.60.67.64)[0.20]---
+         [3](209.152.184.227)[0.05]------
+                  [3](89.245.69.55)[0.10]---
+                           [1](230.214.26.174)[0.30]
+Removido elemento de prioridade 3 com valor de latencia 0.050000 e valor de IP 209.152.184.227
+Imprimindo heap
+                  [2](18.60.67.64)[0.20]
+         [3](89.245.69.55)[0.10]---
+                  [1](230.214.26.174)[0.30]
+Removido elemento de prioridade 3 com valor de latencia 0.100000 e valor de IP 89.245.69.55
+Imprimindo heap
+         [2](18.60.67.64)[0.20]---
+                  [1](230.214.26.174)[0.30]
+Removido elemento de prioridade 2 com valor de latencia 0.200000 e valor de IP 18.60.67.64
+Imprimindo heap
+         [1](230.214.26.174)[0.30]
+Removido elemento de prioridade 1 com valor de latencia 0.300000 e valor de IP 230.214.26.174
