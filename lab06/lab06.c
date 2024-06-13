@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stbool.h>
+#include <stdbool.h>
 #include <string.h>
 
 typedef struct _NodeHeap
@@ -13,7 +13,7 @@ typedef struct _NodeHeap
 typedef struct _heap
 {
     NodeHeap *info;   
-    int MaxSize, NumElem;
+    int MaxSize, NumElems;
 } Heap;
 
 Heap *CriaHeap(int MaxSize)
@@ -21,7 +21,7 @@ Heap *CriaHeap(int MaxSize)
     Heap *H = (Heap*)calloc(1, sizeof(Heap));
 
     H->MaxSize = MaxSize;
-    H->NumElem = 0;
+    H->NumElems = 0;
     H->info = (NodeHeap*)calloc(H->MaxSize, sizeof(NodeHeap));
 
     return H;
@@ -29,31 +29,36 @@ Heap *CriaHeap(int MaxSize)
 
 bool HeapCheio(Heap **MaxHeap)
 {
-    if ((*MaxHeap)->NumElem >= (*MaxHeap)->MaxSize)
+    if ((*MaxHeap)->NumElems >= (*MaxHeap)->MaxSize)
         return true;
     else
         return false;
 }
 
-void InsereHeap(Heap **MaxHeap, char *ip, int prioridade, float, latencia)
+void InsereHeap(Heap **MaxHeap, char *ip, int prioridade, float latencia)
 {
     if (!HeapCheio(MaxHeap))
     {
-        (*MaxHeap)->NumElem += 1;
-        strcpy((*MaxHeap)->info[(*MaxHeap)->nelems-1].ip, ip);
-        (*MaxHeap)->info[(*MaxHeap)->nelems-1].prioridade = prioridade;
-        (*MaxHeap)->info[(*MaxHeap)->nelems-1].latencia = latencia;
+        (*MaxHeap)->NumElems += 1;
+        strcpy((*MaxHeap)->info[(*MaxHeap)->NumElems-1].ip, ip);
+        (*MaxHeap)->info[(*MaxHeap)->NumElems-1].prioridade = prioridade;
+        (*MaxHeap)->info[(*MaxHeap)->NumElems-1].latencia = latencia;
     }
+}
+
+void Sobeheap(Heap **MAxHeap)
+{
+    
 }
 
 void LeHeap(char *nomearq, Heap **MaxHeap)
 {
-    int QntIp;
+    int QntIp, prioridade;
     char ip[16];
     float AuxLatencia;
     
     FILE *fp = fopen(nomearq, "r");
-    fsacnf(fp, %d\n, &QntIp);
+    fsacnf(fp, "%d\n", &QntIp);
     
     (*MaxHeap) = CriaHeap(QntIp);
     
@@ -61,6 +66,7 @@ void LeHeap(char *nomearq, Heap **MaxHeap)
     {
         fscanf(fp, "%s %d %f\n ", ip, &prioridade, &AuxLatencia);
         InsereHeap(&(*MaxHeap)->info, ip, prioridade, AuxLatencia);
+        SobeHeap(MaxHeap);
     }
 
     fclose(fp);
