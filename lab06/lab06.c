@@ -42,9 +42,9 @@ bool HeapCheio(Heap **MaxHeap)
 
 void Troca(NodeHeap *A, NodeHeap *B)
 {
-    NodeHeap *aux = A;
-    A = B;
-    B = aux;
+    NodeHeap aux = *A;
+    *A = *B;
+    *B = aux;
 }
 
 void SobeHeap(Heap **MaxHeap, int i)
@@ -52,7 +52,7 @@ void SobeHeap(Heap **MaxHeap, int i)
    int pai;
    pai = Pai(i);
 
-   while ((pai >= 0) && ((*MaxHeap)->info[pai].prioridade < (*MaxHeap)->info[i].prioridade))
+  while ((pai >= 0) && ((*MaxHeap)->info[pai].prioridade < (*MaxHeap)->info[i].prioridade))
    {
     Troca(&(*MaxHeap)->info[i], &(*MaxHeap)->info[pai]);
     i = pai;
@@ -89,26 +89,24 @@ void LeHeap(char *nomearq, Heap **MaxHeap)
         fscanf(fp, "%s %d %f\n ", ip, &prioridade, &AuxLatencia);
         printf("%s %d %.2f\n", ip, prioridade, AuxLatencia);
         InsereHeap(MaxHeap, ip, prioridade, AuxLatencia);
-        //SobeHeap(MaxHeap, i);
+        //SobeHeap(MaxHeap, (*MaxHeap)->NumElems);
     }
-
+    
     fclose(fp);
 }
 
-void PrintMAxHeap(Heap *MaxHeap, int indice, int nivel)
-{
+void PrintMaxHeap(Heap *MaxHeap, int indice, int nivel) {
     int i;
 
-    if (indice < MaxHeap->NumElems)
-    {
-        PrintMAxHeap(MaxHeap, FilhoDireito(indice), nivel + 1);
+    if (indice < MaxHeap->NumElems) {
+        PrintMaxHeap(MaxHeap, FilhoDireito(indice), nivel + 1);
         for (i = 0; i < nivel; i++)
             printf("   ");
-        printf("%03d",MaxHeap->info[indice].ip);
+        printf("[%d](%s)[%.2f]", MaxHeap->info[indice].prioridade, MaxHeap->info[indice].ip, MaxHeap->info[indice].latencia);
         for (i = 0; i <= (int)log2(MaxHeap->NumElems) - nivel; i++)
             printf("---");
         printf("\n");
-        PrintMAxHeap(MaxHeap, FilhoEsquerdo(indice), nivel + 1);
+        PrintMaxHeap(MaxHeap, FilhoEsquerdo(indice), nivel + 1);
     }
 }
 
@@ -117,7 +115,7 @@ int main(int argc, char **argv)
     Heap *MaxHeap = NULL; 
     
     LeHeap("in/arq1.in", &MaxHeap);
-    PrintMAxHeap(MaxHeap, 0, 1);
+    PrintMaxHeap(MaxHeap, 0, 1);
     
     return 0;
 }
