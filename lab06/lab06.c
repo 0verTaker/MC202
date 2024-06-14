@@ -110,12 +110,51 @@ void PrintMaxHeap(Heap *MaxHeap, int indice, int nivel) {
     }
 }
 
+void Printheap(Heap *MaxHeap)
+{
+    for (int i = 0; i < MaxHeap->NumElems; i++)
+    {
+        printf("[%d] ", MaxHeap->info[i].prioridade);
+    }
+}
+
+void DesceHeap(Heap **MaxHeap, int i)
+{
+    int maior,esq,dir;
+    esq = FilhoEsquerdo(i);
+    dir = FilhoDireito(i);
+
+    if ((esq < (*MaxHeap)->NumElems) && ((*MaxHeap)->info[esq].prioridade > (*MaxHeap)->info[i].prioridade))
+        maior = esq;
+    else
+        maior = i;
+
+    if ((dir < (*MaxHeap)->info[esq].prioridade) && ((*MaxHeap)->info[dir].prioridade > (*MaxHeap)->info[maior].prioridade))
+        maior = dir;
+
+    if (maior != i){
+        Troca(&(*MaxHeap)->info[esq], &(*MaxHeap)->info[maior]);
+        DesceHeap(MaxHeap,maior);		
+    }
+}
+
+void ConstroiHeap(Heap **MaxHeap)
+{
+    int n = Pai((*MaxHeap)->NumElems-1);
+
+    for (int i = n; i >= 0; i--)
+        DesceHeap(MaxHeap, i);
+}
+
 int main(int argc, char **argv)
 {
     Heap *MaxHeap = NULL; 
     
-    LeHeap("in/arq1.in", &MaxHeap);
+    LeHeap("in/arq2.in", &MaxHeap);
+    ConstroiHeap(&MaxHeap);
     PrintMaxHeap(MaxHeap, 0, 1);
     
+    //Printheap(MaxHeap);
+
     return 0;
 }
