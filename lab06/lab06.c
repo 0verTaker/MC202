@@ -55,12 +55,19 @@ void Troca(NodeHeap *A, NodeHeap *B)
     *B = aux;
 }
 
+int ComparaNodes(NodeHeap a, NodeHeap b) {
+    if (a.prioridade != b.prioridade) 
+        return a.prioridade - b.prioridade;
+    else 
+        return (a.latencia < b.latencia) ? 1 : ((a.latencia > b.latencia) ? -1 : 0);
+}
+
 void SobeHeap(Heap **MaxHeap, int i)
 {
     int pai;
     pai = Pai(i);
 
-    while ((pai >= 0) && ((*MaxHeap)->info[pai].prioridade < (*MaxHeap)->info[i].prioridade))
+    while ((i > 0) && (ComparaNodes((*MaxHeap)->info[i], (*MaxHeap)->info[pai]) > 0))
     {
         Troca(&(*MaxHeap)->info[i], &(*MaxHeap)->info[pai]);
         i = pai;
@@ -76,13 +83,12 @@ void InsereHeap(Heap **MaxHeap, char *ip, int prioridade, float latencia)
         strcpy((*MaxHeap)->info[(*MaxHeap)->NumElems-1].ip, ip);
         (*MaxHeap)->info[(*MaxHeap)->NumElems-1].prioridade = prioridade;
         (*MaxHeap)->info[(*MaxHeap)->NumElems-1].latencia = latencia;
-        SobeHeap(MaxHeap, (*MaxHeap)->NumElems-1);
     }
 }
 
 void LeHeap(char *nomearq, Heap **MaxHeap)
 {
-    int QntIp, prioridade;
+    int QntIp, Prioridade;
     char ip[16];
     float AuxLatencia;
     
@@ -93,10 +99,8 @@ void LeHeap(char *nomearq, Heap **MaxHeap)
     
     for (int i = 0; i < QntIp; i++)
     {
-        fscanf(fp, "%s %d %f\n ", ip, &prioridade, &AuxLatencia);
-        printf("%s %d %.2f\n", ip, prioridade, AuxLatencia);
-        InsereHeap(MaxHeap, ip, prioridade, AuxLatencia);
-        //SobeHeap(MaxHeap, (*MaxHeap)->NumElems);
+        fscanf(fp, "%s %d %f\n ", ip, &Prioridade, &AuxLatencia);
+        InsereHeap(MaxHeap, ip, Prioridade, AuxLatencia);
     }
     
     fclose(fp);
@@ -116,68 +120,83 @@ void PrintMaxHeap(Heap *MaxHeap, int indice, int nivel) {
     }
 }
 
-void Printheap(Heap *MaxHeap)
+void PrintHeap(Heap **Heap)
 {
-    for (int i = 0; i < MaxHeap->NumElems; i++)
-    {
-        printf("[%d] ", MaxHeap->info[i].prioridade);
-    }
+    for (int i = 0; i < (*Heap)->NumElems; i++)
+        printf("%s %d %.2f\n", (*Heap)->info[i].ip, (*Heap)->info[i].prioridade, (*Heap)->info[i].latencia);
 }
 
-void DesceHeap(Heap **MaxHeap, int i)
-{
-    int maior,esq,dir;
+void DesceHeap(Heap **MaxHeap, int i) {
+    int maior, esq, dir;
     esq = FilhoEsquerdo(i);
     dir = FilhoDireito(i);
+    maior = i;
 
-    if ((esq < (*MaxHeap)->NumElems) && ((*MaxHeap)->info[esq].prioridade > (*MaxHeap)->info[i].prioridade))
+    if (esq < (*MaxHeap)->NumElems && ComparaNodes((*MaxHeap)->info[esq], (*MaxHeap)->info[maior]) > 0)
         maior = esq;
-    else
-        maior = i;
 
-    if ((dir < (*MaxHeap)->info[esq].prioridade) && ((*MaxHeap)->info[dir].prioridade > (*MaxHeap)->info[maior].prioridade))
+    if (dir < (*MaxHeap)->NumElems && ComparaNodes((*MaxHeap)->info[dir], (*MaxHeap)->info[maior]) > 0)
         maior = dir;
 
-    if (maior != i){
-        Troca(&(*MaxHeap)->info[esq], &(*MaxHeap)->info[maior]);
-        DesceHeap(MaxHeap,maior);		
+    if (maior != i) {
+        Troca(&(*MaxHeap)->info[i], &(*MaxHeap)->info[maior]);
+        DesceHeap(MaxHeap, maior);
     }
 }
 
-NodeHeap RemoveHeap(Heap **MaxHeap)
-{
+NodeHeap RemoveHeap(Heap **MaxHeap) {
     NodeHeap Removed;
 
-    if (!HeapVazio(MaxHeap))
-    {
+    if (!HeapVazio(MaxHeap)) {
         Removed = (*MaxHeap)->info[0];
-        Troca(&(*MaxHeap)->info[0], &(*MaxHeap)->info[(*MaxHeap)->NumElems-1]);
+        Troca(&(*MaxHeap)->info[0], &(*MaxHeap)->info[(*MaxHeap)->NumElems - 1]);
         (*MaxHeap)->NumElems--;
         DesceHeap(MaxHeap, 0);
     }
     return Removed;
 }
 
+void TransformaHeap(Heap **Heap)
+{
+    for (int i = Pai((*Heap)->NumElems); i >= 0; i--)
+        DesceHeap(Heap, i);
+}
+
+void DestroiHeap(Heap **MaxHeap)
+{
+    if (*MaxHeap != NULL)
+    {
+        free((*MaxHeap)->info);
+        free(*MaxHeap);
+        *MaxHeap = NULL;
+    }
+}
+
 int main(int argc, char **argv)
 {
     Heap *MaxHeap = NULL; 
+    int i = 0;
     
+    LeHeap(argv[1], &MaxHeap);
     printf("1) Sequencia Lida\n");
-    LeHeap("in/arq2.in", &MaxHeap);
+    PrintHeap(&MaxHeap);
+    TransformaHeap(&MaxHeap);
     
     printf("\n2) Heap maximo construido\n");
     printf("Imprimindo heap\n");
     PrintMaxHeap(MaxHeap, 0, 1);
     
     printf("3) Removendo elementos do heap por ordem de prioridade e restricao de latencia\n");
-    for (int i = 0; i < MaxHeap->NumElems; i++)
+    while (!HeapVazio(&MaxHeap))
     {
         NodeHeap RemovedNode;
         RemovedNode = RemoveHeap(&MaxHeap);
         printf("Removido elemento de prioridade %d com valor de latencia %f e valor de IP %s\n", RemovedNode.prioridade, RemovedNode.latencia, RemovedNode.ip);
-        printf("Imprimindo heap\n");
+        if (i < MaxHeap->MaxSize-1) printf("Imprimindo heap\n");
         PrintMaxHeap(MaxHeap, 0, 1);
+        i++;
     }
-  
+    
+    DestroiHeap(&MaxHeap);
     return 0;
 }
