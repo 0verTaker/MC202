@@ -67,8 +67,7 @@ void SobeHeap(Heap **MaxHeap, int i)
     {
         Troca(&(*MaxHeap)->info[i], &(*MaxHeap)->info[pai]);
         i = pai;
-        pai = ((i-1)/2
-        );
+        pai = ((i-1)/2);
     }
 }
 
@@ -118,14 +117,6 @@ void PrintMaxHeap(Heap *MaxHeap, int indice, int nivel) {
     }
 }
 
-void Printheap(Heap *MaxHeap)
-{
-    for (int i = 0; i < MaxHeap->NumElems; i++)
-    {
-        printf("[%d] ", MaxHeap->info[i].prioridade);
-    }
-}
-
 void DesceHeap(Heap **MaxHeap, int i) {
     int maior, esq, dir;
     esq = (2*i+1);
@@ -155,6 +146,11 @@ NodeHeap RemoveHeap(Heap **MaxHeap) {
     }
     return Removed;
 }
+void TransformaHeap(Heap **Heap)
+{
+    for (int i = (*Heap)->NumElems; i > 0 ; i--)
+        SobeHeap(Heap, i);
+}
 
 int main(int argc, char **argv)
 {
@@ -162,11 +158,7 @@ int main(int argc, char **argv)
     
     printf("1) Sequencia Lida\n");
     LeHeap("in/arq2.in", &MaxHeap);
-    
-    for (int i = MaxHeap->NumElems; i > 0 ; i--)
-    {
-        SobeHeap(&MaxHeap, i);
-    }
+    TransformaHeap(&MaxHeap);
 
     printf("\n2) Heap maximo construido\n");
     printf("Imprimindo heap\n");
