@@ -1,0 +1,14 @@
+Matriz de adjacencia: 
+	A 	B 	C 	D 	E 
+A	0	2.000	0	1.414	0
+B	2.000	0	2.000	1.414	2.000
+C	0	2.000	0	0	0
+D	1.414	1.414	0	0	0
+E	0	2.000	0	0	0
+Percurso mínimo: 
+Percurso [No A]: (D 1.414214)  (B 2.000000)  (C 4.000000)  (E 4.000000) 
+Percurso [No B]: (D 1.414214)  (E 2.000000)  (A 2.000000)  (C 2.000000) 
+Percurso [No C]: (B 2.000000)  (D 3.414214)  (E 4.000000)  (A 4.000000) 
+Percurso [No D]: (A 1.414214)  (B 1.414214)  (C 3.414214)  (E 3.414214) 
+Percurso [No E]: (B 2.000000)  (D 3.414214)  (A 4.000000)  (C 4.000000) 
+Grafo tem 1 componentes
