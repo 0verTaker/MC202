@@ -82,11 +82,74 @@ void PrintGrafoMatriz(Grafo** Grafo, int NumNode) {
     }
 }
 
+int DistanciaMinima(double Dist[], int Processado[], int NumNode)
+{
+    double Minimo = INT_MAX;
+    int IndiceMinimo = -1;
+
+    for (int i = 0; i < NumNode; i++)
+    {
+        if (!Processado[i] && Dist[i] < Minimo)
+        {
+            Minimo = Dist[i];
+            IndiceMinimo = i;
+        }
+    }
+    return IndiceMinimo;
+}
+
+void dijkstra(Grafo *Grafo, int Fonte, double Dist[])
+{
+    int Processado[Grafo->NumNode];
+
+    for (int i = 0; i < Grafo->NumNode; i++)
+    {
+        Dist[i] = INT_MAX;
+        Processado[i] = 0;
+    }
+    Dist[Fonte] = 0;
+
+    for (int i = 0; i < Grafo->NumNode - 1; i++)
+    {
+        int u = DistanciaMinima(Dist, Processado, Grafo->NumNode);
+        if (u == -1) break;
+        Processado[u] = 1;
+
+        for (int j = 0; j < Grafo->NumNode; j++)
+        {
+            if ((!Processado[j]) && (Grafo->Node[u].Adj[j] > 0) && (Dist[u] != INT_MAX) && (Dist[u] + Grafo->Node[u].Adj[j] < Dist[j]))
+            {
+                Dist[j] = Dist[u] + Grafo->Node[u].Adj[j];
+            }
+        }
+    }
+}
+
+void PrintCaminhoMinimo(Grafo* G) {
+    for (int i = 0; i < G->NumNode; i++) {
+        double dist[G->NumNode];
+        dijkstra(G, i, dist);
+
+        printf("Percurso [No %c]:", G->Node[i].Nome);
+        int Ilha = 1;
+        for (int j = 0; j < G->NumNode; j++) {
+            if (i != j && dist[j] != INT_MAX) {
+                printf(" (%c %.6f)", G->Node[j].Nome, dist[j]);
+                Ilha = 0;
+            }
+        }
+        if (Ilha) {
+            printf(" E uma ilha");
+        }
+        printf("\n");
+    }
+}
+
 int main(int argc, char **argv)
 {
     Grafo *Grafo = LeGrafo(argv[1]);
     AchaAdj(&Grafo->Node, Grafo->NumNode);
     PrintGrafoMatriz(&Grafo, Grafo->NumNode);
-    
+    PrintCaminhoMinimo(Grafo);
     return 0;
 }
